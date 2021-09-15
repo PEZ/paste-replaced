@@ -119,6 +119,10 @@ Say you want to be able to write ”bare” url fragments in Markdown documents 
 
 ![Paste Bare URL as Markdown Link](assets/paste-markdown-url-replaced.gif)
 
+## Your examples
+
+I've created a [gist for collecting examples](https://gist.github.com/PEZ/676706cdea7fdd24f23d92127fd2b3e2). Please consider adding your uses of this extension there!
+
 ## Why an array of arrays of tuples?
 
 You might have guessed it already. Since the extension only uses the first one you can use the rest of the array as a repository of nifty `Replacers`.
