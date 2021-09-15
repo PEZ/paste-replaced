@@ -28,7 +28,7 @@ With these settings:
     ],
 ```
 
-And you have the this text copied:
+And you have this text copied:
 
 ```
 I love you!
