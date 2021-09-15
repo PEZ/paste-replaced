@@ -4,7 +4,11 @@
 
 ## Features
 
-Pastes the text on the Clipboard replaced with regular expressions that you configure. 
+Pastes the text from the Clipboard replaced with regular expressions that you configure.
+
+Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>, <kbd>V</kbd>
+
+But first you need to configure `paste-replaced.replacers`. Please read on.
 
 ## An example
 
@@ -30,7 +34,7 @@ And you have the this text copied:
 I love you!
 ```
 
-Then if you **Paste Replaced** (`Ctrl+Alt+V`), you will paste:
+Then if you **Paste Replaced** <kbd>Ctrl</kbd>+<kbd>Alt</kbd>, <kbd>V</kbd>, you will paste:
 
 ```
 💪♥️♥️♥️♥️♥️♥️♥️♥️♥️💪
