@@ -14,7 +14,7 @@ But first you need to configure `paste-replaced.replacers`. Please read on.
 
 With these settings:
 
-```json
+```js
     "paste-replaced.replacers": [
         [
             [".", "♥️", "g"],
@@ -44,7 +44,7 @@ Then if you **Paste Replaced** <kbd>Ctrl</kbd>+<kbd>Alt</kbd>, <kbd>V</kbd>, you
 
 Paste Replace will read the first array of `[search, replace, flags?]` tuples in the `paste-replaced.replacers` array. (Yes, the settings is an array of arrays of tuples.) This we call a `Replacer`. In the example that is:
 
-```json
+```js
         [
             [".", "♥️", "g"],
             ["♥️", "💪"],    
@@ -68,7 +68,7 @@ For each `[search, replace, flags?]` tuple. So for the example:
 
 With these settings:
 
-```json
+```js
     "paste-replaced.replacers": [
         [
             ["\\.", "/", "g"],
@@ -104,7 +104,7 @@ Last one, promise!
 
 Say you want to be able to write ”bare” url fragments in Markdown documents and easily convert them to proper links with `https://` prepended to the url part. Easy peasy!
 
-```json
+```js
     "paste-replaced.replacers": [
         [ // hostname/path -> Markdown url
             [".*", "[$&](https://$&)"],
