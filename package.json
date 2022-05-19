@@ -1,88 +1,115 @@
 {
-	"name": "paste-replaced",
-	"displayName": "Paste Replaced",
-	"description": "Pastes the contents of the clipboard, replaced using regular expressions that you configure",
-	"version": "1.0.0",
-	"publisher": "betterthantomorrow",
-	"author": {
-		"name": "Peter Strömberg",
-		"email": "pez@pezius.com"
-	},
-	"icon": "assets/paste-replaced-icon-128x128.png",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/PEZ/paste-replaced.git"
-	},
-	"engines": {
-		"vscode": "^1.60.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"keywords": [
-		"Clipboard",
-		"Paste",
-		"Regex"
-	],
-	"activationEvents": [
-		"onCommand:paste-replaced.paste"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "paste-replaced.paste",
-				"title": "Paste Replaced"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "paste-replaced.paste",
-				"key": "ctrl+alt+v"
-			}
-		],
-		"configuration": [
-			{
-				"type": "object",
-				"title": "Paste Replaced",
-				"properties": {
-					"paste-replaced.replacers": {
-						"type": "array",
-						"markdownDescription": "An array of arrays of `[search, replace, flags?]` tuples. _**NB:** Only the first item will be used. User this to have a way to save patterns that are not currently active._",
-						"items": {
-							"type": "array",
-							"markdownDescription": "An array of `[search, replace, flags?]` tuples. These will be applied to the text in the order they are configured.",
-							"items": {
-								"type": "array",
-								"markdownDescription": "A `[search, replace, flags?]` tuple where `search` is a JS regular expression,`replace` is a string, and `flags?` is an optional string. The first occurrence of `search` will be replaced by `replace`, unless the `g` flag is provided.",
-								"minItems": 2,
-								"maxItems": 3
-							}
-						}
-					}
-				}
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile && npm run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/vscode": "^1.60.0",
-		"@types/glob": "^7.1.3",
-		"@types/mocha": "^8.2.2",
-		"@types/node": "14.x",
-		"eslint": "^7.27.0",
-		"@typescript-eslint/eslint-plugin": "^4.26.0",
-		"@typescript-eslint/parser": "^4.26.0",
-		"glob": "^7.1.7",
-		"mocha": "^8.4.0",
-		"typescript": "^4.3.2",
-		"vscode-test": "^1.5.2"
-	}
+  "name": "paste-replaced",
+  "displayName": "Paste Replaced",
+  "description": "Pastes the contents of the clipboard, replaced using regular expressions that you configure",
+  "version": "1.1.0",
+  "publisher": "betterthantomorrow",
+  "author": {
+    "name": "Peter Strömberg",
+    "email": "pez@pezius.com"
+  },
+  "icon": "assets/paste-replaced-icon-128x128.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PEZ/paste-replaced.git"
+  },
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "Clipboard",
+    "Paste",
+    "Regex",
+		"Fast Typing",
+		"Canned",
+		"Replace",
+		"Substitute"
+  ],
+  "activationEvents": [
+    "onCommand:paste-replaced.paste",
+    "onCommand:paste-replaced.selectAllAndPasteReplaced",
+    "onCommand:paste-replaced.selectWordLeftAndPasteReplaced"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "paste-replaced.paste",
+        "Category": "Paste Replaced",
+        "title": "Paste"
+      },
+      {
+        "command": "paste-replaced.selectAllAndPasteReplaced",
+        "Category": "Paste Replaced",
+        "title": "Select and Copy All Text and Paste"
+      },
+      {
+        "command": "paste-replaced.selectWordLeftAndPasteReplaced",
+        "Category": "Paste Replaced",
+        "title": "Select and Copy Word Left and Paste"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "paste-replaced.paste",
+        "key": "ctrl+alt+v v"
+      },
+      {
+        "command": "paste-replaced.selectAllAndPasteReplaced",
+        "key": "ctrl+alt+v ctrl+alt+v",
+        "when": "!editorTextFocus"
+      },
+      {
+        "command": "paste-replaced.selectWordLeftAndPasteReplaced",
+        "key": "ctrl+alt+v ctrl+alt+v",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": [
+      {
+        "type": "object",
+        "title": "Paste Replaced",
+        "properties": {
+          "paste-replaced.replacers": {
+            "type": "array",
+            "markdownDescription": "An array of arrays of `[search, replace, flags?]` tuples. _**NB:** Only the first item will be used. User this to have a way to save patterns that are not currently active._",
+            "items": {
+              "type": "array",
+              "markdownDescription": "An array of `[search, replace, flags?]` tuples. These will be applied to the text in the order they are configured.",
+              "items": {
+                "type": "array",
+                "markdownDescription": "A `[search, replace, flags?]` tuple where `search` is a JS regular expression,`replace` is a string, and `flags?` is an optional string. The first occurrence of `search` will be replaced by `replace`, unless the `g` flag is provided.",
+                "minItems": 2,
+                "maxItems": 3
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.60.0",
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "14.x",
+    "eslint": "^7.27.0",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "glob": "^7.1.7",
+    "mocha": "^8.4.0",
+    "typescript": "^4.3.2",
+    "vscode-test": "^1.5.2"
+  }
 }
