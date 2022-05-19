@@ -2,7 +2,7 @@
   "name": "paste-replaced",
   "displayName": "Paste Replaced",
   "description": "Pastes the contents of the clipboard, replaced using regular expressions that you configure",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "betterthantomorrow",
   "author": {
     "name": "Peter Strömberg",
@@ -75,13 +75,13 @@
         "properties": {
           "paste-replaced.replacers": {
             "type": "array",
-            "markdownDescription": "An array of arrays of `[search, replace, flags?]` tuples. _**NB:** Only the first item will be used. User this to have a way to save patterns that are not currently active._",
+            "markdownDescription": "An array of arrays of `[search, replace, flags?]` tuples. _**NB:** Only the first array will be used by the extension. Use the other ”slots” to have a way to save patterns that are not currently active._",
             "items": {
               "type": "array",
               "markdownDescription": "An array of `[search, replace, flags?]` tuples. These will be applied to the text in the order they are configured.",
               "items": {
                 "type": "array",
-                "markdownDescription": "A `[search, replace, flags?]` tuple where `search` is a JS regular expression,`replace` is a string, and `flags?` is an optional string. The first occurrence of `search` will be replaced by `replace`, unless the `g` flag is provided.",
+                "markdownDescription": "A `[search, replace, flags?]` tuple where `search` is a string that compiles to a JS regex pattern, `replace` is a string that compiles to a regex replace pattern, and `flags?` is an optional string of regex flags. Only the first occurrence of `search` will be replaced by `replace`, unless the `g` flag is provided.",
                 "minItems": 2,
                 "maxItems": 3
               }
