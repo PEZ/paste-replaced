@@ -23,10 +23,10 @@
     "Clipboard",
     "Paste",
     "Regex",
-		"Fast Typing",
-		"Canned",
-		"Replace",
-		"Substitute"
+    "Fast Typing",
+    "Canned",
+    "Replace",
+    "Substitute"
   ],
   "activationEvents": [
     "onCommand:paste-replaced.paste",
@@ -50,6 +50,12 @@
         "command": "paste-replaced.selectWordLeftAndPasteReplaced",
         "Category": "Paste Replaced",
         "title": "Select and Copy Word Left and Paste"
+      },
+      {
+        "command": "paste-replaced.interruptTyping",
+        "Category": "Paste Replaced",
+        "title": "Interrupt ongoing typing",
+        "enablement": "paste-replaced.isTyping"
       }
     ],
     "keybindings": [
@@ -66,6 +72,11 @@
         "command": "paste-replaced.selectWordLeftAndPasteReplaced",
         "key": "ctrl+alt+v ctrl+alt+v",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "paste-replaced.interruptTyping",
+        "key": "ctrl+alt+v escape",
+        "when": "paste-replaced.isTyping"
       }
     ],
     "configuration": [
@@ -86,6 +97,23 @@
                 "maxItems": 3
               }
             }
+          },
+          "paste-replaced.simulateTypingSpeed": {
+            "type": "string",
+            "markdownDescription": "Should the text be inserted simulating that it is being ”typed” in? If so, how fast should the typing be?",
+            "enum": [
+              "instant",
+              "fast",
+              "intermediate",
+              "slow"
+            ],
+            "enumDescriptions": [
+              "Don't simulate typing, just paste it all",
+              "Pour the text in fast",
+              "Type the text neither fast, nor slow",
+              "Slowly type the text in"
+            ],
+            "default": "instant"
           }
         }
       }
