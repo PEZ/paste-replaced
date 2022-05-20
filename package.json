@@ -33,7 +33,7 @@
     "onCommand:paste-replaced.selectAllAndPasteReplaced",
     "onCommand:paste-replaced.selectWordLeftAndPasteReplaced"
   ],
-  "main": "./out/extension.js",
+  "main": "extension.js",
   "contributes": {
     "commands": [
       {
@@ -120,24 +120,20 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "clean": "rimraf .cpcache .shadow-cljs/ out/",
+    "watch": "npx shadow-cljs -d cider/cider-nrepl:0.27.4 watch :extension",
+    "prewatch": "npm run clean",
+    "compile": "npx shadow-cljs compile :extension",
+    "release": "npx shadow-cljs release :extension",
+    "package": "npx vsce package --allow-star-activation",
+    "vscode:prepublish": "npm run clean && npm run release"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.30"
   },
   "devDependencies": {
-    "@types/vscode": "^1.60.0",
-    "@types/glob": "^7.1.3",
-    "@types/mocha": "^8.2.2",
-    "@types/node": "14.x",
-    "eslint": "^7.27.0",
-    "@typescript-eslint/eslint-plugin": "^4.26.0",
-    "@typescript-eslint/parser": "^4.26.0",
-    "glob": "^7.1.7",
-    "mocha": "^8.4.0",
-    "typescript": "^4.3.2",
-    "vscode-test": "^1.5.2"
+    "rimraf": "^3.0.2",
+    "shadow-cljs": "^2.18.0",
+    "vsce": "^2.7.0"
   }
 }
