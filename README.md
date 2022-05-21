@@ -200,7 +200,7 @@ You can go quite fancy with how you want things to be replaced. Most things you 
 
 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 
-## Licence
+## License
 
 MIT
 
