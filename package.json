@@ -38,22 +38,22 @@
     "commands": [
       {
         "command": "paste-replaced.paste",
-        "Category": "Paste Replaced",
+        "category": "Paste Replaced",
         "title": "Paste"
       },
       {
         "command": "paste-replaced.selectAllAndPasteReplaced",
-        "Category": "Paste Replaced",
+        "category": "Paste Replaced",
         "title": "Select and Copy All Text and Paste"
       },
       {
         "command": "paste-replaced.selectWordLeftAndPasteReplaced",
-        "Category": "Paste Replaced",
+        "category": "Paste Replaced",
         "title": "Select and Copy Word Left and Paste"
       },
       {
         "command": "paste-replaced.interruptTyping",
-        "Category": "Paste Replaced",
+        "category": "Paste Replaced",
         "title": "Interrupt ongoing typing",
         "enablement": "paste-replaced.isTyping"
       }
