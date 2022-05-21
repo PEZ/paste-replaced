@@ -43,7 +43,11 @@
 (defn interrupt-typing! []
   (swap! db/!app-db assoc :typing-interrupted? true))
 
-(defn simulate-typing [new-text type-pause]
+(defn simulate-typing
+  "Chops up `new-text` in characters and then, one at a time,
+   writes them to the clipboard and then pastes them. Pausing
+   with a randomized distribution around `type-pause`."
+  [new-text type-pause]
   (p/let [matches  (re-seq #"\s+|\S+" new-text)
           words (if matches matches [])]
     (p/run!
@@ -63,7 +67,12 @@
             (re-seq unicode-split-re word)))))
      words)))
 
-(defn paste-replaced!+ []
+
+(defn paste-replaced!+
+  "Pastes what is on the Clipboard and pastes it with the replacers
+   configured in `paste-replaced.replacers`.
+   Restores original (un-replaced) clipboard content when done."
+  []
   (try
     (p/let [all-replacers (-> (vscode/workspace.getConfiguration "paste-replaced")
                               (.get "replacers")
@@ -98,6 +107,10 @@
                              error))))))
 
 (defn select-and-paste-replaced!+
+  "Selects some text, copied it and then pastes it replaced.
+   Restoring original clipboard contents when done.
+   `select-command-id` is the command id to use for selecting
+   the text to be pasted replaced."
   [select-command-id]
   (p/let [original-clipboard-text (vscode/env.clipboard.readText)]
     (p/do! (vscode/commands.executeCommand  select-command-id)
@@ -105,8 +118,14 @@
            (paste-replaced!+)
            (vscode/env.clipboard.writeText original-clipboard-text))))
 
-(defn select-all-and-paste-replaced!+ []
+(defn select-all-and-paste-replaced!+
+  "Selects all text and then pastes it replaced.
+   Extra useful in input prompts."
+  []
   (p/do! (select-and-paste-replaced!+ "editor.action.selectAll")))
 
-(defn select-word-left-and-paste-replaced!+ []
+(defn select-word-left-and-paste-replaced!+
+  "Selects the word to the left of the cursor, then pastes it replaced.
+   Only works in a `vscode/TextEditor`."
+  []
   (p/do! (select-and-paste-replaced!+ "cursorWordLeftSelect")))
