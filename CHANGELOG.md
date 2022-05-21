@@ -2,6 +2,11 @@
 
 Changes to Paste Replaced
 
+## 1.1.1 - 2021-09-21
+
+- Fast typing has speed settings, typing in text character by character
+- Ported extension to from TypeScript ClojureScript
+
 ## 1.1.0 - 2021-09-15
 
 - Command(s) for replacing text at will. Can be used for quick-typing canned snippets

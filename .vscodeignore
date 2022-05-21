@@ -1,12 +1,14 @@
-.vscode/**
-.vscode-test/**
-out/test/**
+# Put everything on the blacklist by default
+*
+*/**
+**/.*
+*/**/.*
 
-src/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/*.map
-**/*.ts
+# Whitelist
+!extension.js
+!package.json
+!assets/**
+!README.md
+!CHANGELOG.md
+!LICENSE.txt
+!out/extension.js

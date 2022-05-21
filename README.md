@@ -8,6 +8,7 @@
    * Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>V</kbd>
 * ”Fast-typing” command(s) for inserting canned text, like `_hw` with some text, e.g. `console.log("Hello World!")`.
    * Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>
+   * The fast-typing can be made to simulate the text being typed in, at three levels of speed
 
 Both features uses the same replacement configuration. And both features work when editing files *as well as in the various input prompts/fields in VS Code or from any extension*. (However, in the terminal, only the _paste clipboard content replaced_ works.)
 
