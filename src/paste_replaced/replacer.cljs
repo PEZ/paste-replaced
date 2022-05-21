@@ -25,13 +25,13 @@
    "slow" 15})
 
 (defn humanize-pause
-  [s typePause]
+  [s pause]
   (cond
-    (re-find #"^ |\t$" s) (gaussian-rand typePause (.pow js/Math (* typePause 2) 2.2))
-    (re-find #"\s{2,}|\n" s) (gaussian-rand typePause
-                                            (* (.pow js/Math (* (+ typePause 5) 2) 2)
-                                               3))
-    :else (gaussian-rand 0 (* typePause 20))))
+    (re-find #"^ |\t$" s) (gaussian-rand pause 
+                                         (.pow js/Math (* pause 2) 2.2))
+    (re-find #"\s{2,}|\n" s) (gaussian-rand pause 
+                                            (* (.pow js/Math (* (+ pause 5) 2) 2) 3))
+    :else (gaussian-rand 0 (* pause 20))))
 
 (def ^:private unicode-split-re (js/RegExp. "." "u"))
 
@@ -45,28 +45,28 @@
 
 (defn paste-replaced!+ []
   (try
-    (p/let [allReplacers (-> (vscode/workspace.getConfiguration "paste-replaced")
-                             (.get "replacers")
-                             (cljify))]
-      (if (and allReplacers (> (count allReplacers) 0))
-        (p/let [replacersConfig (first allReplacers)
+    (p/let [all-replacers (-> (vscode/workspace.getConfiguration "paste-replaced")
+                              (.get "replacers")
+                              (cljify))]
+      (if (and all-replacers (> (count all-replacers) 0))
+        (p/let [replacers-config (first all-replacers)
                 replacers (map
                            (fn [r]
                              [(js/RegExp. (r 0) (get r 2 "")) (r 1)])
-                           replacersConfig)
-                originalClipBoardText (vscode/env.clipboard.readText)
-                newText (reduce (fn [acc [s r]]
-                                  (.replace acc s r))
-                                originalClipBoardText
-                                replacers)
-                simulateTyping (-> (vscode/workspace.getConfiguration "paste-replaced")
-                                   (.get "simulateTypingSpeed"))]
+                           replacers-config)
+                original-clipboard-text (vscode/env.clipboard.readText)
+                new-text (reduce (fn [acc [s r]]
+                                   (.replace acc s r))
+                                 original-clipboard-text
+                                 replacers)
+                simulate-typing (-> (vscode/workspace.getConfiguration "paste-replaced")
+                                    (.get "simulateTypingSpeed"))]
           (typing!+ true)
-          (if (= simulateTyping "instant")
-            (p/do! (vscode/env.clipboard.writeText newText)
+          (if (= simulate-typing "instant")
+            (p/do! (vscode/env.clipboard.writeText new-text)
                    (vscode/commands.executeCommand "execPaste"))
-            (p/let [typePause (typing-speed simulateTyping)
-                    matches  (re-seq #"\s+|\S+" newText)
+            (p/let [type-pause (typing-speed simulate-typing)
+                    matches  (re-seq #"\s+|\S+" new-text)
                     words (if matches matches [])]
               (p/run!
                (fn [word]
@@ -79,12 +79,12 @@
                                (p/create
                                 (fn [resolve, _reject]
                                   (js/setTimeout resolve
-                                                 (humanize-pause s typePause)))))))
+                                                 (humanize-pause s type-pause)))))))
                     (if (re-find #"\s{2,}" word)
                       [word]
                       (re-seq unicode-split-re word)))))
                words)))
-          (vscode/env.clipboard.writeText originalClipBoardText)
+          (vscode/env.clipboard.writeText original-clipboard-text)
           (typing!+ false))
         (vscode/window.showWarningMessage "No replacers configured?")))
     (catch :default error
@@ -95,16 +95,16 @@
       (throw (js/Error. (str "Paste Replaced failed: "
                              error))))))
 
-(defn select-and-paste-replaced
+(defn select-and-paste-replaced!+
   [select-command-id]
-  (p/let [originalClipboardText (vscode/env.clipboard.readText)]
+  (p/let [original-clipboard-text (vscode/env.clipboard.readText)]
     (p/do! (vscode/commands.executeCommand  select-command-id)
            (vscode/commands.executeCommand  "execCopy")
            (paste-replaced!+)
-           (vscode/env.clipboard.writeText originalClipboardText))))
+           (vscode/env.clipboard.writeText original-clipboard-text))))
 
-(defn select-all-and-paste-replaced []
-  (p/do! (select-and-paste-replaced "editor.action.selectAll")))
+(defn select-all-and-paste-replaced!+ []
+  (p/do! (select-and-paste-replaced!+ "editor.action.selectAll")))
 
-(defn select-word-left-and-paste-replaced []
-  (p/do! (select-and-paste-replaced "cursorWordLeftSelect")))
+(defn select-word-left-and-paste-replaced!+ []
+  (p/do! (select-and-paste-replaced!+ "cursorWordLeftSelect")))

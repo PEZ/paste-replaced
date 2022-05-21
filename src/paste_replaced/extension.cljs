@@ -1,6 +1,5 @@
 (ns paste-replaced.extension
   (:require ["vscode" :as vscode]
-            [clojure.string :as string]
             [paste-replaced.db :as db]
             [paste-replaced.replacer :as replacer]
             [paste-replaced.utils :as utils :refer [info jsify]]
@@ -31,8 +30,8 @@
     (utils/sayln "Paste Replace activating"))
   (let [{:keys [extension-context]} @db/!app-db]
     (register-command! extension-context "paste-replaced.paste" #'replacer/paste-replaced!+)
-    (register-command! extension-context "paste-replaced.selectAllAndPasteReplaced" #'replacer/select-all-and-paste-replaced)
-    (register-command! extension-context "paste-replaced.selectWordLeftAndPasteReplaced" #'replacer/select-word-left-and-paste-replaced)
+    (register-command! extension-context "paste-replaced.selectAllAndPasteReplaced" #'replacer/select-all-and-paste-replaced!+)
+    (register-command! extension-context "paste-replaced.selectWordLeftAndPasteReplaced" #'replacer/select-word-left-and-paste-replaced!+)
     (register-command! extension-context "paste-replaced.interruptTyping" #'replacer/interrupt-typing!)
     (when-contexts/set-context!+ ::when-contexts/paste-replaced.isActive true)
     api))
@@ -51,4 +50,5 @@
   (js/console.log "shadow-cljs reloaded paste-replaced"))
 
 (comment
+  #_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
   (def ba (before after)))
