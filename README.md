@@ -10,17 +10,13 @@
    * Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>
    * The fast-typing can be made to simulate the text being typed in, at three levels of speed
 
+![paste-replaced-fast-typing-demo](https://user-images.githubusercontent.com/30010/169660546-9100a4a3-4b5c-4bed-8000-62d64dbba475.gif)
+
 Both features uses the same replacement configuration. And both features work when editing files *as well as in the various input prompts/fields in VS Code or from any extension*. (However, in the terminal, only the _paste clipboard content replaced_ works.)
 
 The uses cases for pasting replaced might be very different. The one that made me write this extension was to be able to fuzzy search for files, with a path that isn't in the format that VS Code's fuzzy search expects it. So I configured replacement from `.` to `/`, and from `-` to `_`, in that case.
 
 The use case for the ”fast-typing” could probably be something else than quickly inserting canned text, but again, that was the reason for adding the feature. (MacOS built-in text-substitution does not work in VS Code, for some reason.) You might wonder why I don't just use custom Snippets? That's because those don't work outside the edited files. I needed something that works in other input fields as well.
-
-This Gif shows the _fast-typing_ feature. (Even if I am using the prototype I first made with the VS Code scripting extension [Joyride](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.joyride))
-
-![paste-replaced-joyride](https://user-images.githubusercontent.com/30010/169280509-0baec48e-bedd-4fdd-8586-85daba725c82.gif)
-
-(If you're curious about Joyride and how this feature could be prototyped, see [this post, that explains it](https://clojureverse.org/t/say-hello-to-joyride-the-clojure-repl-in-vs-code/8957) somewhat.)
 
 First you need to configure `paste-replaced.replacers`. Replacers are applied in the order they appear in the first replacers array. Each replacer is tuple of `[search, replace_with, flags?]`, which are passed to the JavaScript function used:
 
