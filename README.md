@@ -2,6 +2,8 @@
 
 ![Paste Replaced Icon](assets/paste-replaced-icon-128x128.png)
 
+Spiff up your presentations by quickly inserting canned text anywhere in VS Code. Or automate replacements on text on the clipboard. E.g. when pasting into JSON strings.
+
 ## Features
 
 * Pastes the text from the Clipboard replaced with configurable regular expressions.
