@@ -19,7 +19,7 @@
   (js/Math.floor
    (+ start (* (gaussian-rand') (+ (- end start) 1)))))
 
-(def typing-speed
+(def typing-pauses
   {"fast" 0.01
    "intermediate" 6
    "slow" 15})
@@ -27,9 +27,9 @@
 (defn humanize-pause
   [s pause]
   (cond
-    (re-find #"^ |\t$" s) (gaussian-rand pause 
+    (re-find #"^ |\t$" s) (gaussian-rand pause
                                          (.pow js/Math (* pause 2) 2.2))
-    (re-find #"\s{2,}|\n" s) (gaussian-rand pause 
+    (re-find #"\s{2,}|\n" s) (gaussian-rand pause
                                             (* (.pow js/Math (* (+ pause 5) 2) 2) 3))
     :else (gaussian-rand 0 (* pause 20))))
 
@@ -42,6 +42,26 @@
 
 (defn interrupt-typing! []
   (swap! db/!app-db assoc :typing-interrupted? true))
+
+(defn simulate-typing [new-text type-pause]
+  (p/let [matches  (re-seq #"\s+|\S+" new-text)
+          words (if matches matches [])]
+    (p/run!
+     (fn [word]
+       (when-not (:typing-interrupted? @db/!app-db)
+         (p/run!
+          (fn [s]
+            (when-not (:typing-interrupted? @db/!app-db)
+              (p/do! (vscode/env.clipboard.writeText s)
+                     (vscode/commands.executeCommand "execPaste")
+                     (p/create
+                      (fn [resolve, _reject]
+                        (js/setTimeout resolve
+                                       (humanize-pause s type-pause)))))))
+          (if (re-find #"\s{2,}" word)
+            [word]
+            (re-seq unicode-split-re word)))))
+     words)))
 
 (defn paste-replaced!+ []
   (try
@@ -59,31 +79,13 @@
                                    (.replace acc s r))
                                  original-clipboard-text
                                  replacers)
-                simulate-typing (-> (vscode/workspace.getConfiguration "paste-replaced")
-                                    (.get "simulateTypingSpeed"))]
+                simulate-typing-config (-> (vscode/workspace.getConfiguration "paste-replaced")
+                                           (.get "simulateTypingSpeed"))]
           (typing!+ true)
-          (if (= simulate-typing "instant")
+          (if (= simulate-typing-config "instant")
             (p/do! (vscode/env.clipboard.writeText new-text)
                    (vscode/commands.executeCommand "execPaste"))
-            (p/let [type-pause (typing-speed simulate-typing)
-                    matches  (re-seq #"\s+|\S+" new-text)
-                    words (if matches matches [])]
-              (p/run!
-               (fn [word]
-                 (when-not (:typing-interrupted? @db/!app-db)
-                   (p/run!
-                    (fn [s]
-                      (when-not (:typing-interrupted? @db/!app-db)
-                        (p/do! (vscode/env.clipboard.writeText s)
-                               (vscode/commands.executeCommand "execPaste")
-                               (p/create
-                                (fn [resolve, _reject]
-                                  (js/setTimeout resolve
-                                                 (humanize-pause s type-pause)))))))
-                    (if (re-find #"\s{2,}" word)
-                      [word]
-                      (re-seq unicode-split-re word)))))
-               words)))
+            (simulate-typing new-text (typing-pauses simulate-typing-config)))
           (vscode/env.clipboard.writeText original-clipboard-text)
           (typing!+ false))
         (vscode/window.showWarningMessage "No replacers configured?")))
