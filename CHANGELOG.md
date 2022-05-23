@@ -2,6 +2,11 @@
 
 Changes to Paste Replaced
 
+## 1.1.2 - 2021-09-23
+
+- Tweaks to fast-typing speeds
+- Bug fix for new-lines w/o indents in fast-typed text
+
 ## 1.1.1 - 2021-09-21
 
 - Fast typing has speed settings, typing in text character by character

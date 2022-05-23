@@ -20,20 +20,26 @@
    (+ start (* (gaussian-rand') (+ (- end start) 1)))))
 
 (def typing-pauses
-  {"fast" 0.01
-   "intermediate" 6
-   "slow" 15})
+  {"fast" {:char 0
+           :space 0
+           :nl 350}
+   "intermediate" {:char 75
+           :space 250
+           :nl 1300}
+   "slow" {:char 350
+           :space 1000
+           :nl 2500}})
+
+(def typing-speed "slow")
 
 (defn humanize-pause
-  [s pause]
+  [s typing-speed]
   (cond
-    (re-find #"^ |\t$" s) (gaussian-rand pause
-                                         (.pow js/Math (* pause 2) 2.2))
-    (re-find #"\s{2,}|\n" s) (gaussian-rand pause
-                                            (* (.pow js/Math (* (+ pause 5) 2) 2) 3))
-    :else (gaussian-rand 0 (* pause 20))))
+    (re-find #"^ |\t$" s) (gaussian-rand 0 (-> typing-speed typing-pauses :space))
+    (re-find #"\s{2,}|\n" s) (gaussian-rand 0 (-> typing-speed typing-pauses :nl))
+    :else (gaussian-rand 0 (-> typing-speed typing-pauses :char))))
 
-(def ^:private unicode-split-re (js/RegExp. "." "u"))
+(def ^:private unicode-split-re (js/RegExp. "." "us"))
 
 (defn typing!+
   [typing?]
@@ -47,7 +53,7 @@
   "Chops up `new-text` in characters and then, one at a time,
    writes them to the clipboard and then pastes them. Pausing
    with a randomized distribution around `type-pause`."
-  [new-text type-pause]
+  [new-text typing-speed]
   (p/let [matches  (re-seq #"\s+|\S+" new-text)
           words (if matches matches [])]
     (p/run!
@@ -61,7 +67,7 @@
                      (p/create
                       (fn [resolve, _reject]
                         (js/setTimeout resolve
-                                       (humanize-pause s type-pause)))))))
+                                       (humanize-pause s typing-speed)))))))
           (if (re-find #"\s{2,}" word)
             [word]
             (re-seq unicode-split-re word)))))
@@ -94,7 +100,7 @@
           (if (= simulate-typing-config "instant")
             (p/do! (vscode/env.clipboard.writeText new-text)
                    (vscode/commands.executeCommand "execPaste"))
-            (simulate-typing new-text (typing-pauses simulate-typing-config)))
+            (simulate-typing new-text simulate-typing-config))
           (vscode/env.clipboard.writeText original-clipboard-text)
           (typing!+ false))
         (vscode/window.showWarningMessage "No replacers configured?")))
