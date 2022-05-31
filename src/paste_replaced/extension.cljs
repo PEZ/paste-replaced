@@ -21,6 +21,7 @@
                                     (when-contexts/context k))}))
 
 (defn ^:export activate [context]
+  (js/console.info "Paste Replace activate START")
   (when context
     (swap! db/!app-db assoc
            :output-channel (vscode/window.createOutputChannel "Paste Replaced")
@@ -34,6 +35,7 @@
     (register-command! extension-context "paste-replaced.selectWordLeftAndPasteReplaced" #'replacer/select-word-left-and-paste-replaced!+)
     (register-command! extension-context "paste-replaced.interruptTyping" #'replacer/interrupt-typing!)
     (when-contexts/set-context!+ ::when-contexts/paste-replaced.isActive true)
+    (js/console.info "Paste Replace activate END")
     api))
 
 (defn ^:export deactivate []
