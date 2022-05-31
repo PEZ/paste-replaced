@@ -2,6 +2,11 @@
 
 Changes to Paste Replaced
 
+## [Unreleased]
+
+- Change display name to Typist
+- Add some logging when Typist starts and finsishes activating
+
 ## 1.1.2 - 2021-09-23
 
 - Tweaks to fast-typing speeds
