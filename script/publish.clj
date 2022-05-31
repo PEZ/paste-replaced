@@ -63,7 +63,7 @@
   (tag paste-replaced-version)
   (push)
   (println "Open to follow the progress of the release:")
-  (println "  https://app.circleci.com/pipelines/github/BetterThanTomorrow/paste-replaced"))
+  (println "  https://app.circleci.com/pipelines/github/PEZ/paste-replaced"))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (let [unreleased-changelog-text (get-unreleased-changelog-text
