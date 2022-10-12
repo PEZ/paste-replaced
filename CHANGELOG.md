@@ -6,8 +6,7 @@ Changes to Paste Replaced
 
 ## [1.1.3] - 2022-05-31
 
-- Change display name to Typist
-- Add some logging when Typist starts and finsishes activating
+- Add some logging when Paste Replaced starts and finsishes activating
 
 ## 1.1.2 - 2021-09-23
 

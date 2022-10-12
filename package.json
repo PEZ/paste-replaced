@@ -1,6 +1,6 @@
 {
   "name": "paste-replaced",
-  "displayName": "Typist",
+  "displayName": "Paste Replaced",
   "description": "Paste text replaced using regular expressions that you configure, optionally simulating that you are typing it. Works anywhere in VS Code, not just the editors. E.g. ood for fast typing canned text in your presentations and a lot of other cases.",
   "version": "1.1.4",
   "publisher": "betterthantomorrow",
@@ -39,22 +39,22 @@
     "commands": [
       {
         "command": "paste-replaced.paste",
-        "category": "Typist",
+        "category": "Paste Replaced",
         "title": "Paste"
       },
       {
         "command": "paste-replaced.selectAllAndPasteReplaced",
-        "category": "Typist",
+        "category": "Paste Replaced",
         "title": "Select and Copy All Text and Paste"
       },
       {
         "command": "paste-replaced.selectWordLeftAndPasteReplaced",
-        "category": "Typist",
+        "category": "Paste Replaced",
         "title": "Select and Copy Word Left and Paste"
       },
       {
         "command": "paste-replaced.interruptTyping",
-        "category": "Typist",
+        "category": "Paste Replaced",
         "title": "Interrupt ongoing typing",
         "enablement": "paste-replaced.isTyping"
       }
@@ -83,7 +83,7 @@
     "configuration": [
       {
         "type": "object",
-        "title": "Typist",
+        "title": "Paste Replaced",
         "properties": {
           "paste-replaced.replacers": {
             "type": "array",
