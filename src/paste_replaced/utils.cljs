@@ -45,7 +45,7 @@
   (vscode/window.showErrorMessage (str/join " " (mapv str xs))))
 
 (def ^{:dynamic true
-       :doc "Should the Joyride output channel be revealed after `say`?
+       :doc "Should the Paste Replaced output channel be revealed after `say`?
              Default: `true`"}
   *show-when-said?* false)
 

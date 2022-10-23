@@ -73,6 +73,9 @@
             (re-seq unicode-split-re word)))))
      words)))
 
+(defn- compile-regex [r]
+  [(js/RegExp. (r 0) (get r 2 "")) (r 1)])
+
 
 (defn paste-replaced!+
   "Pastes what is on the Clipboard and pastes it with the replacers
@@ -85,11 +88,15 @@
                               (cljify))]
       (if (and all-replacers (> (count all-replacers) 0))
         (p/let [replacers-config (first all-replacers)
+                _ (def replacers-config replacers-config)
                 replacers (map
                            (fn [r]
-                             [(js/RegExp. (r 0) (get r 2 "")) (r 1)])
-                           replacers-config)
+                             (compile-regex r))
+                           (if (vector? replacers-config)
+                             replacers-config
+                             (:replacements replacers-config)))
                 original-clipboard-text (vscode/env.clipboard.readText)
+                _ (def replacers replacers)
                 new-text (reduce (fn [acc [s r]]
                                    (.replace acc s r))
                                  original-clipboard-text

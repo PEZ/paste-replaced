@@ -1,8 +1,7 @@
 (ns paste-replaced.when-contexts
   (:require ["vscode" :as vscode]))
 
-(defonce ^:private !db (atom {:contexts {::paste-replaced.isActive false
-                                         ::paste-replaced.isNReplServerRunning false}}))
+(defonce ^:private !db (atom {:contexts {::paste-replaced.isActive false}}))
 
 (defn set-context!+ [k v]
   (swap! !db assoc-in [:contexts k] v)
