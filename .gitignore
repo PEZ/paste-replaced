@@ -20,8 +20,6 @@ node_modules
 /.portal/vs-code.edn
 .calva/output-window/
 
-# Joyride
+# Extension
 /out/
 .portal
-examples/.joyride/.calva
-examples/.vscode
