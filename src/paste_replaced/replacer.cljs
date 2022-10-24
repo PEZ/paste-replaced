@@ -172,15 +172,15 @@
    If `select-command-id` is `nil`, the current selection is used."
   ([]
    (select-and-paste-replaced!+ nil))
-  ([^js select-command]
-   (p/let [command-id (when select-command (.-selectCommandId select-command))
-           provided-replacer (when select-command (.-replacer select-command))
+  ([^js command-args]
+   (p/let [command-id (when command-args (.-selectCommandId command-args))
+           provided-replacer (when command-args (.-replacer command-args))
            original-clipboard-text (vscode/env.clipboard.readText)]
-     (when select-command
+     (when command-args
        (if command-id
          (vscode/commands.executeCommand command-id)
          (throw (js/Error (str "Invalid select-command config provided: "
-                               (js/JSON.stringify select-command))))))
+                               (js/JSON.stringify command-args))))))
      (vscode/commands.executeCommand  "execCopy")
      (paste-replaced!+ provided-replacer)
      (vscode/env.clipboard.writeText original-clipboard-text))))
