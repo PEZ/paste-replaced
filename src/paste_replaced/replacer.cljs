@@ -143,9 +143,11 @@
                             (-> replacer-or-show-menu? cljify vector?)
                             (cljify replacer-or-show-menu?)
 
+                            (-> replacer-or-show-menu? cljify map?)
+                            (:replacer (cljify replacer-or-show-menu?))
+
                             :else
                             (vscode/window.showErrorMessage "Malformed replacer provided"))]
-           (def replacer replacer)
            (when replacer
              (paste-replaced-using-replacer!+ replacer)))
          (vscode/window.showWarningMessage "No replacers configured?")))
