@@ -76,6 +76,30 @@
 (defn- compile-regex [r]
   [(js/RegExp. (r 0) (get r 2 "")) (r 1)])
 
+(defn- paste-replaced-using-replacer!+
+  [replacers-config]
+  (def replacers-config replacers-config)
+  (p/let [replacers (map
+                     (fn [r]
+                       (compile-regex r))
+                     (if (vector? replacers-config)
+                       replacers-config
+                       (:replacements replacers-config)))
+          original-clipboard-text (vscode/env.clipboard.readText)
+          _ (def replacers replacers)
+          new-text (reduce (fn [acc [s r]]
+                             (.replace acc s r))
+                           original-clipboard-text
+                           replacers)
+          simulate-typing-config (-> (vscode/workspace.getConfiguration "paste-replaced")
+                                     (.get "simulateTypingSpeed"))]
+    (typing!+ true)
+    (if (= simulate-typing-config "instant")
+      (p/do! (vscode/env.clipboard.writeText new-text)
+             (vscode/commands.executeCommand "execPaste"))
+      (simulate-typing new-text simulate-typing-config))
+    (vscode/env.clipboard.writeText original-clipboard-text)
+    (typing!+ false)))
 
 (defn paste-replaced!+
   "Pastes what is on the Clipboard and pastes it with the replacers
@@ -83,33 +107,13 @@
    Restores original (un-replaced) clipboard content when done."
   []
   (try
-    (p/let [all-replacers (-> (vscode/workspace.getConfiguration "paste-replaced")
-                              (.get "replacers")
-                              (cljify))]
+    (p/let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
+                                      (.inspect "replacers")
+                                      (cljify))
+            all-replacers (into (:workspaceValue all-replacers-configs)
+                                (:globalValue all-replacers-configs))]
       (if (and all-replacers (> (count all-replacers) 0))
-        (p/let [replacers-config (first all-replacers)
-                _ (def replacers-config replacers-config)
-                replacers (map
-                           (fn [r]
-                             (compile-regex r))
-                           (if (vector? replacers-config)
-                             replacers-config
-                             (:replacements replacers-config)))
-                original-clipboard-text (vscode/env.clipboard.readText)
-                _ (def replacers replacers)
-                new-text (reduce (fn [acc [s r]]
-                                   (.replace acc s r))
-                                 original-clipboard-text
-                                 replacers)
-                simulate-typing-config (-> (vscode/workspace.getConfiguration "paste-replaced")
-                                           (.get "simulateTypingSpeed"))]
-          (typing!+ true)
-          (if (= simulate-typing-config "instant")
-            (p/do! (vscode/env.clipboard.writeText new-text)
-                   (vscode/commands.executeCommand "execPaste"))
-            (simulate-typing new-text simulate-typing-config))
-          (vscode/env.clipboard.writeText original-clipboard-text)
-          (typing!+ false))
+        (p/do! (paste-replaced-using-replacer!+ (first all-replacers)))
         (vscode/window.showWarningMessage "No replacers configured?")))
     (catch :default error
       (.error js/console error)
