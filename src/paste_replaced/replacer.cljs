@@ -130,12 +130,22 @@
                               (p/let [choice (show-replacers-picker!+ all-replacers)]
                                 (:replacer choice))
                               (first all-replacers))
-                            
+
+                            (string? replacer-or-show-menu?)
+                            (let [found-replacer (->> all-replacers
+                                                      (filter (fn [replacer]
+                                                                (= replacer-or-show-menu? (:name replacer))))
+                                                      first)]
+                              (if found-replacer
+                                found-replacer
+                                (vscode/window.showErrorMessage (str "No replacer found named: " replacer-or-show-menu?))))
+
                             (-> replacer-or-show-menu? cljify vector?)
                             (cljify replacer-or-show-menu?)
-                            
+
                             :else
                             (vscode/window.showErrorMessage "Malformed replacer provided"))]
+           (def replacer replacer)
            (when replacer
              (paste-replaced-using-replacer!+ replacer)))
          (vscode/window.showWarningMessage "No replacers configured?")))
