@@ -100,10 +100,8 @@
     (typing!+ false)))
 
 (defn- show-replacers-picker!+
-  [all-replacers]
-  (p/let [replacers (filter #(and (map? %)
-                                  (:name %)) all-replacers)
-          menu-items (mapv (fn [r]
+  [replacers]
+  (p/let [menu-items (mapv (fn [r]
                              {:label (:name r)
                               :replacer r})
                            replacers)
@@ -123,32 +121,37 @@
                                        (cljify))
              all-replacers (into (:workspaceValue all-replacers-configs)
                                  (:globalValue all-replacers-configs))]
-       (if (and all-replacers (> (count all-replacers) 0))
-         (p/let [replacer (cond
-                            (string? provided-replacer)
-                            (let [found-replacer (->> all-replacers
-                                                      (filter (fn [replacer]
-                                                                (= provided-replacer (:name replacer))))
-                                                      first)]
-                              (if found-replacer
-                                found-replacer
-                                (vscode/window.showErrorMessage (str "No replacer found named: " provided-replacer))))
+       (p/let [replacer (cond
+                          (string? provided-replacer)
+                          (let [found-replacer (->> all-replacers
+                                                    (filter (fn [replacer]
+                                                              (= provided-replacer (:name replacer))))
+                                                    first)]
+                            (if found-replacer
+                              found-replacer
+                              (vscode/window.showErrorMessage (str "No replacer found named: " provided-replacer))))
 
-                            (-> provided-replacer cljify vector?)
-                            (cljify provided-replacer)
+                          (-> provided-replacer cljify vector?)
+                          (cljify provided-replacer)
 
-                            (-> provided-replacer cljify map?)
-                            (:replacer (cljify provided-replacer))
+                          (-> provided-replacer cljify map?)
+                          (:replacer (cljify provided-replacer))
 
-                            (nil? provided-replacer)
-                            (p/let [choice (show-replacers-picker!+ all-replacers)]
-                              (:replacer choice))
-                            
-                            :else
-                            (vscode/window.showErrorMessage "Malformed replacer provided"))]
-           (when replacer
-             (paste-replaced-using-replacer!+ replacer)))
-         (vscode/window.showWarningMessage "No replacers configured?")))
+                          (nil? provided-replacer)
+                          (if (and all-replacers (> (count all-replacers) 0))
+                            (p/let [named-replacers (filter #(and (map? %)
+                                                                  (:name %)) all-replacers)
+                                    choice (when (< 0 (count named-replacers))
+                                             (show-replacers-picker!+ named-replacers))]
+                              (if choice 
+                                (:replacer choice)
+                                (first all-replacers)))
+                            (vscode/window.showWarningMessage "No replacers configured?"))
+
+                          :else
+                          (vscode/window.showErrorMessage "Malformed replacer provided"))]
+         (when replacer
+           (paste-replaced-using-replacer!+ replacer))))
      (catch :default error
        (.error js/console error)
        (vscode/window.showErrorMessage (str "Paste Replaced failed: "
