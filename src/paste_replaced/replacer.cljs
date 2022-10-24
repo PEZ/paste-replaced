@@ -143,11 +143,10 @@
                           (if (and all-replacers (> (count all-replacers) 0))
                             (p/let [named-replacers (filter #(and (map? %)
                                                                   (:name %)) all-replacers)
-                                    choice (when (< 0 (count named-replacers))
-                                             (show-replacers-picker!+ named-replacers))]
-                              (if choice
-                                choice
-                                (first all-replacers)))
+                                    choice (if (< 0 (count named-replacers))
+                                             (show-replacers-picker!+ named-replacers)
+                                             (first all-replacers))]
+                              choice)
                             (vscode/window.showWarningMessage "No replacers configured?"))
 
                           :else
