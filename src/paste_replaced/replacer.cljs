@@ -1,7 +1,7 @@
 (ns paste-replaced.replacer
   (:require ["vscode" :as vscode]
             [paste-replaced.db :as db]
-            [paste-replaced.utils :refer [cljify]]
+            [paste-replaced.utils :refer [cljify jsify]]
             [paste-replaced.when-contexts :as when-contexts]
             [promesa.core :as p]))
 
@@ -24,8 +24,8 @@
            :space 0
            :nl 350}
    "intermediate" {:char 75
-           :space 250
-           :nl 1300}
+                   :space 250
+                   :nl 1300}
    "slow" {:char 350
            :space 1000
            :nl 2500}})
@@ -77,16 +77,14 @@
   [(js/RegExp. (r 0) (get r 2 "")) (r 1)])
 
 (defn- paste-replaced-using-replacer!+
-  [replacers-config]
-  (def replacers-config replacers-config)
+  [replacer]
   (p/let [replacers (map
                      (fn [r]
                        (compile-regex r))
-                     (if (vector? replacers-config)
-                       replacers-config
-                       (:replacements replacers-config)))
+                     (if (vector? replacer)
+                       replacer
+                       (:replacements replacer)))
           original-clipboard-text (vscode/env.clipboard.readText)
-          _ (def replacers replacers)
           new-text (reduce (fn [acc [s r]]
                              (.replace acc s r))
                            original-clipboard-text
@@ -101,27 +99,45 @@
     (vscode/env.clipboard.writeText original-clipboard-text)
     (typing!+ false)))
 
+(defn- show-replacers-picker!+
+  [all-replacers]
+  (p/let [replacers (filter #(and (map? %)
+                                  (:name %)) all-replacers)
+          menu-items (mapv (fn [r]
+                             {:label (:name r)
+                              :replacer r})
+                           replacers)
+          choice (vscode/window.showQuickPick (jsify menu-items) #js {:title "Choose replacer"})]
+    (cljify choice)))
+
 (defn paste-replaced!+
   "Pastes what is on the Clipboard and pastes it with the replacers
    configured in `paste-replaced.replacers`.
    Restores original (un-replaced) clipboard content when done."
-  []
-  (try
-    (p/let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
-                                      (.inspect "replacers")
-                                      (cljify))
-            all-replacers (into (:workspaceValue all-replacers-configs)
-                                (:globalValue all-replacers-configs))]
-      (if (and all-replacers (> (count all-replacers) 0))
-        (p/do! (paste-replaced-using-replacer!+ (first all-replacers)))
-        (vscode/window.showWarningMessage "No replacers configured?")))
-    (catch :default error
-      (.error js/console error)
-      (vscode/window.showErrorMessage (str "Paste Replaced failed: "
-                                           error))
-      (typing!+ false)
-      (throw (js/Error. (str "Paste Replaced failed: "
-                             error))))))
+  ([]
+   (paste-replaced!+ false))
+  ([show-menu?]
+   (try
+     (p/let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
+                                       (.inspect "replacers")
+                                       (cljify))
+             all-replacers (into (:workspaceValue all-replacers-configs)
+                                 (:globalValue all-replacers-configs))]
+       (if (and all-replacers (> (count all-replacers) 0))
+         (p/let [replacer (if show-menu?
+                            (p/let [choice (show-replacers-picker!+ all-replacers)]
+                              (:replacer choice))
+                            (first all-replacers))]
+           (when replacer
+             (paste-replaced-using-replacer!+ replacer)))
+         (vscode/window.showWarningMessage "No replacers configured?")))
+     (catch :default error
+       (.error js/console error)
+       (vscode/window.showErrorMessage (str "Paste Replaced failed: "
+                                            error))
+       (typing!+ false)
+       (throw (js/Error. (str "Paste Replaced failed: "
+                              error)))))))
 
 (defn select-and-paste-replaced!+
   "Selects some text, copied it and then pastes it replaced.
