@@ -31,6 +31,7 @@
   ],
   "activationEvents": [
     "onCommand:paste-replaced.paste",
+    "onCommand:paste-replaced.pasteUsingReplacersMenu",
     "onCommand:paste-replaced.selectAllAndPasteReplaced",
     "onCommand:paste-replaced.selectWordLeftAndPasteReplaced"
   ],
@@ -41,6 +42,11 @@
         "command": "paste-replaced.paste",
         "category": "Paste Replaced",
         "title": "Paste"
+      },
+      {
+        "command": "paste-replaced.pasteUsingReplacersMenu",
+        "category": "Paste Replaced",
+        "title": "Paste... (Show Replacements Menu)"
       },
       {
         "command": "paste-replaced.selectAllAndPasteReplaced",
@@ -65,13 +71,16 @@
         "key": "ctrl+alt+v v"
       },
       {
+        "command": "paste-replaced.pasteUsingReplacersMenu",
+        "key": "ctrl+alt+v ctrl+alt+v"
+      },
+      {
         "command": "paste-replaced.selectAllAndPasteReplaced",
-        "key": "ctrl+alt+v ctrl+alt+v",
-        "when": "!editorTextFocus"
+        "key": "ctrl+alt+v ctrl+a"
       },
       {
         "command": "paste-replaced.selectWordLeftAndPasteReplaced",
-        "key": "ctrl+alt+v ctrl+alt+v",
+        "key": "ctrl+alt+v alt+left",
         "when": "editorTextFocus"
       },
       {

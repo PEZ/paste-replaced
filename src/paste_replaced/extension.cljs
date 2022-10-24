@@ -31,7 +31,8 @@
     (utils/sayln "Paste Replace activating"))
   (let [{:keys [extension-context]} @db/!app-db]
     (register-command! extension-context "paste-replaced.paste" #'replacer/paste-replaced!+)
-    (register-command! extension-context "paste-replaced.selectAllAndPasteReplaced" #'replacer/select-all-and-paste-replaced!+)
+    (register-command! extension-context "paste-replaced.pasteUsingReplacersMenu" #(#'replacer/paste-replaced!+ true))
+    (register-command! extension-context "paste-replaced.selectAllAndPasteReplaced" #(#'replacer/select-and-paste-replaced!+ "editor.action.selectAll"))
     (register-command! extension-context "paste-replaced.selectWordLeftAndPasteReplaced" #'replacer/select-word-left-and-paste-replaced!+)
     (register-command! extension-context "paste-replaced.interruptTyping" #'replacer/interrupt-typing!)
     (when-contexts/set-context!+ ::when-contexts/paste-replaced.isActive true)
