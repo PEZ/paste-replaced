@@ -115,8 +115,8 @@
    configured in `paste-replaced.replacers`.
    Restores original (un-replaced) clipboard content when done."
   ([]
-   (paste-replaced!+ false))
-  ([replacer-or-show-menu?]
+   (paste-replaced!+ nil))
+  ([provided-replacer]
    (try
      (p/let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
                                        (.inspect "replacers")
@@ -125,27 +125,25 @@
                                  (:globalValue all-replacers-configs))]
        (if (and all-replacers (> (count all-replacers) 0))
          (p/let [replacer (cond
-                            (boolean? replacer-or-show-menu?)
-                            (if replacer-or-show-menu?
-                              (p/let [choice (show-replacers-picker!+ all-replacers)]
-                                (:replacer choice))
-                              (first all-replacers))
-
-                            (string? replacer-or-show-menu?)
+                            (string? provided-replacer)
                             (let [found-replacer (->> all-replacers
                                                       (filter (fn [replacer]
-                                                                (= replacer-or-show-menu? (:name replacer))))
+                                                                (= provided-replacer (:name replacer))))
                                                       first)]
                               (if found-replacer
                                 found-replacer
-                                (vscode/window.showErrorMessage (str "No replacer found named: " replacer-or-show-menu?))))
+                                (vscode/window.showErrorMessage (str "No replacer found named: " provided-replacer))))
 
-                            (-> replacer-or-show-menu? cljify vector?)
-                            (cljify replacer-or-show-menu?)
+                            (-> provided-replacer cljify vector?)
+                            (cljify provided-replacer)
 
-                            (-> replacer-or-show-menu? cljify map?)
-                            (:replacer (cljify replacer-or-show-menu?))
+                            (-> provided-replacer cljify map?)
+                            (:replacer (cljify provided-replacer))
 
+                            (nil? provided-replacer)
+                            (p/let [choice (show-replacers-picker!+ all-replacers)]
+                              (:replacer choice))
+                            
                             :else
                             (vscode/window.showErrorMessage "Malformed replacer provided"))]
            (when replacer
@@ -163,22 +161,18 @@
   "Selects some text, copied it and then pastes it replaced.
    Restoring original clipboard contents when done.
    `select-command-id` is the command id to use for selecting
-   the text to be pasted replaced."
-  [select-command-id]
-  (p/let [original-clipboard-text (vscode/env.clipboard.readText)]
-    (p/do! (vscode/commands.executeCommand  select-command-id)
-           (vscode/commands.executeCommand  "execCopy")
-           (paste-replaced!+)
-           (vscode/env.clipboard.writeText original-clipboard-text))))
-
-(defn select-all-and-paste-replaced!+
-  "Selects all text and then pastes it replaced.
-   Extra useful in input prompts."
-  []
-  (p/do! (select-and-paste-replaced!+ "editor.action.selectAll")))
-
-(defn select-word-left-and-paste-replaced!+
-  "Selects the word to the left of the cursor, then pastes it replaced.
-   Only works in a `vscode/TextEditor`."
-  []
-  (p/do! (select-and-paste-replaced!+ "cursorWordLeftSelect")))
+   the text to be pasted replaced.
+   If `select-command-id` is `nil`, the current selection is used."
+  ([]
+   (select-and-paste-replaced!+ nil))
+  ([^js select-command]
+   (p/let [command-id (when select-command (.-commandId select-command))
+           original-clipboard-text (vscode/env.clipboard.readText)]
+     (when select-command
+       (if command-id
+         (vscode/commands.executeCommand command-id)
+         (throw (js/Error (str "Invalid select-command config provided: "
+                               (js/JSON.stringify select-command))))))
+     (vscode/commands.executeCommand  "execCopy")
+     (paste-replaced!+)
+     (vscode/env.clipboard.writeText original-clipboard-text))))
