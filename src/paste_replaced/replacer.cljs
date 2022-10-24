@@ -173,7 +173,8 @@
   ([]
    (select-and-paste-replaced!+ nil))
   ([^js select-command]
-   (p/let [command-id (when select-command (.-commandId select-command))
+   (p/let [command-id (when select-command (.-selectCommandId select-command))
+           provided-replacer (when select-command (.-replacer select-command))
            original-clipboard-text (vscode/env.clipboard.readText)]
      (when select-command
        (if command-id
@@ -181,5 +182,5 @@
          (throw (js/Error (str "Invalid select-command config provided: "
                                (js/JSON.stringify select-command))))))
      (vscode/commands.executeCommand  "execCopy")
-     (paste-replaced!+)
+     (paste-replaced!+ provided-replacer)
      (vscode/env.clipboard.writeText original-clipboard-text))))
