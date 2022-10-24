@@ -116,7 +116,7 @@
    Restores original (un-replaced) clipboard content when done."
   ([]
    (paste-replaced!+ false))
-  ([show-menu?]
+  ([replacer-or-show-menu?]
    (try
      (p/let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
                                        (.inspect "replacers")
@@ -124,10 +124,18 @@
              all-replacers (into (:workspaceValue all-replacers-configs)
                                  (:globalValue all-replacers-configs))]
        (if (and all-replacers (> (count all-replacers) 0))
-         (p/let [replacer (if show-menu?
-                            (p/let [choice (show-replacers-picker!+ all-replacers)]
-                              (:replacer choice))
-                            (first all-replacers))]
+         (p/let [replacer (cond
+                            (boolean? replacer-or-show-menu?)
+                            (if replacer-or-show-menu?
+                              (p/let [choice (show-replacers-picker!+ all-replacers)]
+                                (:replacer choice))
+                              (first all-replacers))
+                            
+                            (-> replacer-or-show-menu? cljify vector?)
+                            (cljify replacer-or-show-menu?)
+                            
+                            :else
+                            (vscode/window.showErrorMessage "Malformed replacer provided"))]
            (when replacer
              (paste-replaced-using-replacer!+ replacer)))
          (vscode/window.showWarningMessage "No replacers configured?")))
