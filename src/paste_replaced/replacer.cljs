@@ -1,6 +1,7 @@
 (ns paste-replaced.replacer
   (:require ["vscode" :as vscode]
             [paste-replaced.db :as db]
+            [paste-replaced.quick-pick :as qp]
             [paste-replaced.utils :refer [cljify jsify]]
             [paste-replaced.when-contexts :as when-contexts]
             [promesa.core :as p]))
@@ -102,11 +103,12 @@
 (defn- show-replacers-picker!+
   [replacers]
   (p/let [menu-items (mapv (fn [r]
-                             {:label (:name r)
-                              :replacer r})
+                             (merge r
+                                    {:label (:name r)
+                                     :replacer r}))
                            replacers)
-          choice (vscode/window.showQuickPick (jsify menu-items) #js {:title "Choose replacer"})]
-    (cljify choice)))
+          choice (qp/quick-pick!+ (jsify menu-items) {:title "Choose replacer"} "replacers")]
+    (:replacer (cljify choice))))
 
 (defn paste-replaced!+
   "Pastes what is on the Clipboard and pastes it with the replacers
@@ -143,8 +145,8 @@
                                                                   (:name %)) all-replacers)
                                     choice (when (< 0 (count named-replacers))
                                              (show-replacers-picker!+ named-replacers))]
-                              (if choice 
-                                (:replacer choice)
+                              (if choice
+                                choice
                                 (first all-replacers)))
                             (vscode/window.showWarningMessage "No replacers configured?"))
 
