@@ -97,9 +97,13 @@
     (typing!+ true)
     (if (= simulate-typing-config "instant")
       (p/do! (vscode/env.clipboard.writeText new-text)
-             (vscode/commands.executeCommand "execPaste"))
-      (simulate-typing new-text simulate-typing-config))
-    (vscode/env.clipboard.writeText original-clipboard-text)
+             (when-not (:skipPaste replacer)
+               (vscode/commands.executeCommand "execPaste")))
+      (if (:skipPaste replacer)
+        (vscode/env.clipboard.writeText new-text)
+        (simulate-typing new-text simulate-typing-config)))
+    (when-not (:skipPaste replacer)
+      (vscode/env.clipboard.writeText original-clipboard-text))
     (typing!+ false)))
 
 (defn- show-replacers-picker!+
@@ -176,19 +180,20 @@
 (defn select-and-paste-replaced!+
   "Selects some text, copies it and then pastes it replaced.
    Restoring original clipboard contents when done.
-   `select-command-id` is the command id to use for selecting
-   the text to be pasted replaced.
-   If `select-command-id` is `nil`, the current selection is used."
+   `command-args` is a `replacer` object with an optional field
+   `selectCommandId` which, if present, will be used for performning
+   a selection that will be copied and than pasted, replacing the
+   selection using any `replacements`.
+   With no `selectCommandId`, the current selection is used."
   ([]
    (select-and-paste-replaced!+ nil))
   ([^js command-args]
    (p/let [command-id (when command-args (.-selectCommandId command-args))
            original-clipboard-text (vscode/env.clipboard.readText)]
      (when command-args
-       (if command-id
-         (vscode/commands.executeCommand command-id)
-         (throw (js/Error (str "Invalid select-command config provided: "
-                               (js/JSON.stringify command-args))))))
+       (when command-id
+         (vscode/commands.executeCommand command-id)))
      (vscode/commands.executeCommand  "execCopy")
      (paste-replaced!+ command-args)
-     (vscode/env.clipboard.writeText original-clipboard-text))))
+     (when-not (.-skipPaste command-args)
+       (vscode/env.clipboard.writeText original-clipboard-text)))))
