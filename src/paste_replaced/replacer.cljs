@@ -142,12 +142,13 @@
 (defn- named-from-picker-or-first!+ [all-replacers]
   (p/let [named-replacers (filter #(and (map? %)
                                         (:name %)) all-replacers)
-              replacer (if (< 0 (count named-replacers))
-                         (show-replacers-picker!+ named-replacers)
-                         (first all-replacers))]
-        (:replacer replacer)))
+          replacer (if (< 0 (count named-replacers))
+                     (show-replacers-picker!+ named-replacers)
+                     (first all-replacers))]
+    (:replacer replacer)))
 
-(defn- pick-replacer!+ [provided-replacer all-replacers]
+(defn- pick-replacer!+
+  [provided-replacer all-replacers]
   (cond
     (string? provided-replacer)
     (let [found-replacer (->> all-replacers
