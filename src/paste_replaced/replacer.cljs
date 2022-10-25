@@ -23,15 +23,16 @@
 (def typing-pauses
   {"fast" {:char 0
            :space 0
-           :nl 350}
+           :nl 350
+           :description "Typed as a really fast keyboard weilder"}
    "intermediate" {:char 75
                    :space 250
-                   :nl 1300}
+                   :nl 1300
+                   :description "Typed as an intermediately fast typist"}
    "slow" {:char 350
            :space 1000
-           :nl 2500}})
-
-(def typing-speed "slow")
+           :nl 2500
+           :description "Typed as a slow, painfully slow, typist"}})
 
 (defn humanize-pause
   [s typing-speed]
@@ -90,8 +91,9 @@
                              (.replace acc s r))
                            original-clipboard-text
                            replacers)
-          simulate-typing-config (-> (vscode/workspace.getConfiguration "paste-replaced")
-                                     (.get "simulateTypingSpeed"))]
+          simulate-typing-config (or (:simulateTypingSpeed replacer)
+                                     (-> (vscode/workspace.getConfiguration "paste-replaced")
+                                         (.get "simulateTypingSpeed")))]
     (typing!+ true)
     (if (= simulate-typing-config "instant")
       (p/do! (vscode/env.clipboard.writeText new-text)
@@ -105,10 +107,20 @@
   (p/let [menu-items (mapv (fn [r]
                              (merge r
                                     {:label (:name r)
-                                     :replacer r}))
+                                     :replacer r}
+                                    (when (:simulateTypingSpeed r)
+                                      {:description (:simulateTypingSpeed r)})))
                            replacers)
           choice (qp/quick-pick!+ (jsify menu-items) {:title "Choose replacer"} "replacers")]
-    (:replacer (cljify choice))))
+    (cljify choice)))
+
+(defn- named-from-picker-or-first!+ [all-replacers]
+  (p/let [named-replacers (filter #(and (map? %)
+                                        (:name %)) all-replacers)
+              replacer (if (< 0 (count named-replacers))
+                         (show-replacers-picker!+ named-replacers)
+                         (first all-replacers))]
+        (:replacer replacer)))
 
 (defn- pick-replacer!+ [provided-replacer all-replacers]
   (cond
@@ -125,16 +137,13 @@
     (cljify provided-replacer)
 
     (-> provided-replacer cljify map?)
-    (:replacer (cljify provided-replacer))
+    (if (-> provided-replacer cljify :replacements)
+      (cljify provided-replacer)
+      (named-from-picker-or-first!+ all-replacers))
 
     (nil? provided-replacer)
     (if (and all-replacers (> (count all-replacers) 0))
-      (p/let [named-replacers (filter #(and (map? %)
-                                            (:name %)) all-replacers)
-              replacer (if (< 0 (count named-replacers))
-                         (show-replacers-picker!+ named-replacers)
-                         (first all-replacers))]
-        replacer)
+      (named-from-picker-or-first!+ all-replacers)
       (vscode/window.showWarningMessage "No replacers configured?"))
 
     :else
@@ -165,7 +174,7 @@
                               error)))))))
 
 (defn select-and-paste-replaced!+
-  "Selects some text, copied it and then pastes it replaced.
+  "Selects some text, copies it and then pastes it replaced.
    Restoring original clipboard contents when done.
    `select-command-id` is the command id to use for selecting
    the text to be pasted replaced.
@@ -174,7 +183,6 @@
    (select-and-paste-replaced!+ nil))
   ([^js command-args]
    (p/let [command-id (when command-args (.-selectCommandId command-args))
-           provided-replacer (when command-args (.-replacer command-args))
            original-clipboard-text (vscode/env.clipboard.readText)]
      (when command-args
        (if command-id
@@ -182,5 +190,5 @@
          (throw (js/Error (str "Invalid select-command config provided: "
                                (js/JSON.stringify command-args))))))
      (vscode/commands.executeCommand  "execCopy")
-     (paste-replaced!+ provided-replacer)
+     (paste-replaced!+ command-args)
      (vscode/env.clipboard.writeText original-clipboard-text))))

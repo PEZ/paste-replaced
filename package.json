@@ -43,8 +43,8 @@
       },
       {
         "command": "paste-replaced.pasteSelectionReplaced",
-        "category": "Paste Selection Replaced",
-        "title": "Copy Selected Text and Paste Replaced"
+        "category": "Paste Replaced",
+        "title": "Copy Selected Text and Paste Replaced..."
       },
       {
         "command": "paste-replaced.interruptTyping",
@@ -71,7 +71,7 @@
         "properties": {
           "paste-replaced.replacers": {
             "type": "array",
-            "markdownDescription": "An array of replacers. _**NB:** Only the first array will be used by the extension. Use the other ”slots” to have a way to save patterns that are not currently active._",
+            "markdownDescription": "An array of replacers. Each replacer is an object with the following properties:\n\n* `name`: A name for the replacer\n* `replacements`: The replacements to be performed before pasting\n* `simulateTypingSpeed`: Simulated typing speed, if any\n\nThe name of each replacer will be used in the menu that is shown when you invoke the command `Paste Replaced...`.",
             "items": {
               "type": "object",
               "markdownDescription": "A replacer has a `name` and a `replacements` array. The `name` is used to identify the replacer in the UI.",
@@ -89,8 +89,29 @@
                     "minItems": 2,
                     "maxItems": 3
                   }
+                },
+                "simulateTypingSpeed": {
+                  "type": "string",
+                  "markdownDescription": "Should the text be inserted simulating that it is being ”typed” in? If so, how fast should the typing be?",
+                  "enum": [
+                    "instant",
+                    "fast",
+                    "intermediate",
+                    "slow"
+                  ],
+                  "enumDescriptions": [
+                    "Don't simulate typing, just paste it all",
+                    "Pour the text in fast",
+                    "Type the text neither fast, nor slow",
+                    "Slowly type the text in"
+                  ],
+                  "default": "instant"
                 }
-              }
+              },
+              "required": [
+                "name",
+                "replacements"
+              ]
             }
           },
           "paste-replaced.simulateTypingSpeed": {
