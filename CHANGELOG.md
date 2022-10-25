@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [1.1.4] - 2022-10-25
+
 - Add Paste Replace... menu
 - Generalize Select and Paste Replace
 - Add `simulateTypingSpeed` local config to **replacers**
