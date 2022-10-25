@@ -4,6 +4,13 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+- Add Paste Replace... menu
+- Generalize Select and Paste Replace
+- Add `simulateTypingSpeed` local config to **replacers**
+- Add `paste-replacted.skipPaste` global option
+- Add `skipPaste` local **replacers** option
+- Keyboard shortcuts can now provide **replacers**, and select command ids (and `simulateTypingSpeed`, and `skipPaste`)
+
 ## [1.1.3] - 2022-05-31
 
 - Add some logging when Paste Replaced starts and finsishes activating
