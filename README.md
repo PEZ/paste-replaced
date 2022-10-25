@@ -108,7 +108,7 @@ You can also configure the replacer as a `paste-replaced.replacers` configuratio
     ],
 ```
 
-That will give you the **Paste Replaced: Paste...*** menu option *Quote strings and newlines*.
+That will give you the **Paste Replaced: Paste...** menu option *Quote strings and newlines*.
 
 ### Both settings and keybinding
 
