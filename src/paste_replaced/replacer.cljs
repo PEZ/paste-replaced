@@ -55,21 +55,21 @@
   "Chops up `new-text` in characters and then, one at a time,
    writes them to the clipboard and then pastes them. Pausing
    with a randomized distribution around `type-pause`."
-  [new-text typing-speed]
-  (p/let [matches  (re-seq #"\s+|\S+" new-text)
+  [text typing-speed]
+  (p/let [matches  (re-seq #"\s+|\S+" text)
           words (if matches matches [])]
     (p/run!
      (fn [word]
        (when-not (:typing-interrupted? @db/!app-db)
          (p/run!
-          (fn [s]
+          (fn [c]
             (when-not (:typing-interrupted? @db/!app-db)
-              (p/do! (vscode/env.clipboard.writeText s)
+              (p/do! (vscode/env.clipboard.writeText c)
                      (vscode/commands.executeCommand "execPaste")
                      (p/create
                       (fn [resolve, _reject]
                         (js/setTimeout resolve
-                                       (humanize-pause s typing-speed)))))))
+                                       (humanize-pause c typing-speed)))))))
           (if (re-find #"\s{2,}" word)
             [word]
             (re-seq unicode-split-re word)))))
@@ -97,7 +97,6 @@
 (defn- paste-replaced-using-replacer!+
   [replacer]
   (p/let [replacements (:replacements replacer)
-          _ (def replacements replacements)
           replacers (if (string? replacements)
                       replacements
                       (map
@@ -106,7 +105,6 @@
                        (if (vector? replacer)
                          replacer
                          (:replacements replacer))))
-          _ (def replacers replacers)
           original-clipboard-text (vscode/env.clipboard.readText)
           new-text (if (string? replacers)
                      replacers
