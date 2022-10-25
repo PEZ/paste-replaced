@@ -55,21 +55,28 @@
   "Chops up `new-text` in characters and then, one at a time,
    writes them to the clipboard and then pastes them. Pausing
    with a randomized distribution around `type-pause`."
-  [new-text typing-speed]
-  (p/let [matches  (re-seq #"\s+|\S+" new-text)
-          words (if matches matches [])]
+  [text typing-speed]
+  (p/let [matches  (re-seq #"\s+|\S+" text)
+          words (if matches matches [])
+          !typed-text (atom "")]
+    ;; These make it so that we can start the typing with `undo`
+    (vscode/env.clipboard.writeText "")
+    (vscode/commands.executeCommand "execPaste")
     (p/run!
      (fn [word]
        (when-not (:typing-interrupted? @db/!app-db)
          (p/run!
           (fn [s]
             (when-not (:typing-interrupted? @db/!app-db)
-              (p/do! (vscode/env.clipboard.writeText s)
-                     (vscode/commands.executeCommand "execPaste")
-                     (p/create
-                      (fn [resolve, _reject]
-                        (js/setTimeout resolve
-                                       (humanize-pause s typing-speed)))))))
+              (p/do!
+               (swap! !typed-text str s)
+               (vscode/env.clipboard.writeText @!typed-text)
+               (vscode/commands.executeCommand "undo")
+               (vscode/commands.executeCommand "execPaste")
+               (p/create
+                (fn [resolve, _reject]
+                  (js/setTimeout resolve
+                                 (humanize-pause s typing-speed)))))))
           (if (re-find #"\s{2,}" word)
             [word]
             (re-seq unicode-split-re word)))))
@@ -97,7 +104,6 @@
 (defn- paste-replaced-using-replacer!+
   [replacer]
   (p/let [replacements (:replacements replacer)
-          _ (def replacements replacements)
           replacers (if (string? replacements)
                       replacements
                       (map
@@ -106,7 +112,6 @@
                        (if (vector? replacer)
                          replacer
                          (:replacements replacer))))
-          _ (def replacers replacers)
           original-clipboard-text (vscode/env.clipboard.readText)
           new-text (if (string? replacers)
                      replacers
@@ -133,13 +138,13 @@
   [replacers]
   (p/let [menu-items (mapv (fn [r]
                              (cond-> r
-                               :always 
+                               :always
                                (assoc :label (:name r)
-                                              :replacer r)
-                               
+                                      :replacer r)
+
                                (simulate-typing-config-for-replacer r)
                                (assoc :description (simulate-typing-config-for-replacer r))
-                               
+
                                (skip-paste-for-replacer? r)
                                (assoc :description "skip paste")))
                            replacers)
