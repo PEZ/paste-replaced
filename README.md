@@ -6,6 +6,8 @@ Wield regular expressions on your Clipboard
 
 Paste Clipboard or selections with configurable edits/replacements. And simulate typing, if you want. Works in editor documents as well as in all VS Code input boxes.
 
+[Paste Replace on the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.paste-replaced)
+
 ## Some use cases
 
 * Automatically quote strings and newlines when pasting into strings (e.g. JSON).
