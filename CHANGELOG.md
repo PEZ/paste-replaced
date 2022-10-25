@@ -10,6 +10,7 @@ Changes to Paste Replaced
 - Add `paste-replacted.skipPaste` global option
 - Add `skipPaste` local **replacers** option
 - Keyboard shortcuts can now provide **replacers**, and select command ids (and `simulateTypingSpeed`, and `skipPaste`)
+- Add `string` type `replacements` for pasting/typing verbatim
 
 ## [1.1.3] - 2022-05-31
 

@@ -39,7 +39,7 @@
       {
         "command": "paste-replaced.paste",
         "category": "Paste Replaced",
-        "title": "Paste Replaced..."
+        "title": "Paste..."
       },
       {
         "command": "paste-replaced.pasteSelectionReplaced",
@@ -81,8 +81,11 @@
                   "markdownDescription": "The name of the replacer. This is only used for display purposes in the UI."
                 },
                 "replacements": {
-                  "type": "array",
-                  "markdownDescription": "An array of `[search, replace, flags?]` tuples. These will be applied to the text in the order they are configured.",
+                  "type": [
+                    "array",
+                    "string"
+                  ],
+                  "markdownDescription": "An array of `[search, replace, flags?]` tuples. These will be applied to the text in the order they are configured. Or a string, which will simply paste the string.",
                   "items": {
                     "type": "array",
                     "markdownDescription": "A `[search, replace, flags?]` tuple where `search` is a string that compiles to a JS regex pattern, `replace` is a string that compiles to a regex replace pattern, and `flags?` is an optional string of regex flags. Only the first occurrence of `search` will be replaced by `replace`, unless the `g` flag is provided.",

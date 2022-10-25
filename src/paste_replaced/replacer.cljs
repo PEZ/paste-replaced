@@ -96,17 +96,24 @@
 
 (defn- paste-replaced-using-replacer!+
   [replacer]
-  (p/let [replacers (map
-                     (fn [r]
-                       (compile-regex r))
-                     (if (vector? replacer)
-                       replacer
-                       (:replacements replacer)))
+  (p/let [replacements (:replacements replacer)
+          _ (def replacements replacements)
+          replacers (if (string? replacements)
+                      replacements
+                      (map
+                       (fn [r]
+                         (compile-regex r))
+                       (if (vector? replacer)
+                         replacer
+                         (:replacements replacer))))
+          _ (def replacers replacers)
           original-clipboard-text (vscode/env.clipboard.readText)
-          new-text (reduce (fn [acc [s r]]
-                             (.replace acc s r))
-                           original-clipboard-text
-                           replacers)
+          new-text (if (string? replacers)
+                     replacers
+                     (reduce (fn [acc [s r]]
+                               (.replace acc s r))
+                             original-clipboard-text
+                             replacers))
           simulate-typing-config (simulate-typing-config-for-replacer replacer)
           skip-paste? (skip-paste-for-replacer? replacer)]
     (typing!+ true)
