@@ -1,47 +1,77 @@
 # Paste Replaced
 
+Wield regular expressions on your Clipboard
+
 ![Paste Replaced Icon](assets/paste-replaced-icon-128x128.png)
 
-Spiff up your presentations by quickly inserting canned text anywhere in VS Code. Or automate replacements on text on the clipboard. E.g. when pasting into JSON strings.
+Paste Clipboard or selections with configurable edits/replacements. And simulate typing, if you want. Works in editor documents as well as in all VS Code input boxes.
+
+## Some use cases
+
+* Automatically quote strings and newlines when pasting into strings (e.g. JSON).
+* Copy package/namespace strings and paste as paths in the 
+* Spiff up your presentations by quickly inserting canned text anywhere in VS Code.
 
 ## Features
 
-* Pastes the text from the Clipboard replaced with configurable regular expressions.
-   * Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>V</kbd>
-* ”Fast-typing” command(s) for inserting canned text, like `_hw` with some text, e.g. `console.log("Hello World!")`.
-   * Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>
-   * The fast-typing can be made to simulate the text being typed in, at three levels of speed
-
-![paste-replaced-fast-typing-demo](https://user-images.githubusercontent.com/30010/169660546-9100a4a3-4b5c-4bed-8000-62d64dbba475.gif)
-
-Both features uses the same replacement configuration. And both features work when editing files *as well as in the various input prompts/fields in VS Code or from any extension*. (However, in the terminal, only the _paste clipboard content replaced_ works.)
+* Configure **replacers** as a series of regular expressions
+* Pastes the text from the Clipboard replaced with configured regular expressions.
+   * Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>SPACE</kbd>
+   * Works in documents as well as in all VS Code input boxes
+* Paste the selection replaced (overwriting it) 
+* Configure typing simulation globally: instant (no simulation), fast, intermediate or slow
+* Override global typing simulation with simulation configured per **replacer**
+* Skip pasting to just place the replaced text on the clipboard
 
 The uses cases for pasting replaced might be very different. The one that made me write this extension was to be able to fuzzy search for files, with a path that isn't in the format that VS Code's fuzzy search expects it. So I configured replacement from `.` to `/`, and from `-` to `_`, in that case.
 
-The use case for the ”fast-typing” could probably be something else than quickly inserting canned text, but again, that was the reason for adding the feature. (MacOS built-in text-substitution does not work in VS Code, for some reason.) You might wonder why I don't just use custom Snippets? That's because those don't work outside the edited files. I needed something that works in other input fields as well.
+The use case for the ”fast-typing” could probably be something else than quickly inserting canned text, even if that was the reason for adding the feature. (MacOS built-in text-substitution does not work in VS Code, for some reason.) You might wonder why I don't just use custom Snippets? That's because those don't work outside the edited files. I needed something that works in other input fields as well.
 
-First you need to configure `paste-replaced.replacers`. Replacers are applied in the order they appear in the first replacers array. Each replacer is tuple of `[search, replace_with, flags?]`, which are passed to the JavaScript function used:
+## How to Paste Replaced
 
-```javascript
+You can use the **Paste Replaced: Paste..** menu, and/or you can configure keyboard shortcuts. 
+
+To  populate the menu you need to configure `paste-replaced.replacers`. To use replacers from keyboard shortcuts, you bind keys to the `paste-replaced.paste` command provding a replacer. In both cases the replacers look like so:
+
+Setting | Type | Description
+--- | --- | ---
+`name` | `string` | Used in the **Paste Replaced: Paste...** menu and when referencing the replacer in a keyboard shortcut.
+`replacements` | `array` of tuples:<br>  `[search, replace_with, flags?]`<br> _or_ `string` | The tuples will be compiled to regular expressions, and applied to the text in the order they appear in the array. If a string is given, it will be pasted as it is, regardless of what is on the clipboard.
+`simulateTypingSpeed` | `enum`:<br> `"instant"`, `"fast"`, `"intermediate"`, `"slow"` | If set to `"instant"`, no typing simulation will be applied, otherwise simulate typing of configured speed.
+`skipPaste`| `boolean` | If set to `true`, the replaced text will stay on the clipboard and not be pasted.
+
+The `replacements` tuples are used something like so:
+
+``` javascript
 newText = text.replace(new RegExp(search, flags), replace_with)
 ```
 
-I've switched them because it makes more sense to me, and the flags are optional.
+(I've switched the order of the arguments, because it makes more sense to me, and because the flags are optional.)
 
-`paste-replaced.replacers` is configured as an array of arrays of replacer tuples. Only the first array or replacers is used. The others slots are there for you to use to store replacers for different use cases.
+**NB**: Watch for terminology used above. A **replacer** is an entry in the **Paste Replace: Paste...** menu, or provided as the argument to the `paste-replaced.paste` command in keyboard shortcuts. A **replacer** has **replacements**, that array of regex tuples.
 
 ## A Paste Clipboard Replaced Example
 
-Say you need to configure code snippets in JSON. Just pasting the code leaves you with the task of quoting double quotes, potentially trimming strings of whitespace, and removing new lines. Here's a configuration that will do all that when you paste:
+Say you need to configure code snippets in JSON. Just pasting the code leaves you with the task of quoting double quotes, potentially trimming strings of whitespace, and removing new lines.
+
+### Via keybindings
+
+Here's a keyboard shortcut configuration that will do all that:
 
 ```json
-    "paste-replaced.replacers": [
-        [
-            [ "\"", "\\\"", "g" ],
-            [ " +", " ", "g" ],
-            [ "\n", "\\n", "g" ],
-        ]
-    ],
+    {
+        "command": "paste-replaced.paste",
+        "key": "ctrl+alt+v q",
+        "args": {
+            // "name" if not strictly needed
+            "name": "Quote strings and newlines",
+            "replacements": [
+                [ "\"", "\\\"", "g" ],
+                [ " +", " ", "g" ],
+                [ "\n", "\\n", "g" ],
+            ]
+        },
+    }
 ``` 
 
 Then if you have this text on the clipboard:
@@ -52,23 +82,59 @@ console.log(
     );
 ```
 
-And do <kbd>Paste Replace: Paste</kbd>, you'll get:
+Then place the cursor in an empty string (`""`), and do <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd> <kbd>Q</kbd>, you'll get:
 
 ```js
-console.log(\n \"Hello World!\"\n );
+"console.log(\n \"Hello World!\"\n );"
 ```
 
-Which is much more JSON friendly. You might want to leave strings of spaces, then skip the `[ " +", " ", "g" ]` replacer.
+Which is much more JSON friendly. (You might want to leave strings of spaces, then skip the `[ " +", " ", "g" ]` replacer.)
 
-## A ”Fast Typing” Example
+### Via `settings.json`
 
-I wanted to replace `_hw` with:
+You can also configure the replacer as a `paste-replaced.replacers` configuration:
+
+``` json
+    "paste-replaced.replacers": [
+        {
+            "name": "Quote strings and newlines",
+            "replacements": [
+                [ "\"", "\\\"", "g" ],
+                [ " +", " ", "g" ],
+                [ "\n", "\\n", "g" ],
+            ]
+        },
+        ...
+    ],
+```
+
+That will give you the **Paste Replaced: Paste...*** menu option *Quote strings and newlines*.
+
+### Both settings and keybinding
+
+You can make shortcuts referencing replacers configured in settings.json, to keep things a bit DRY:
+
+```json
+    {
+        "command": "paste-replaced.paste",
+        "key": "ctrl+alt+v q",
+        "args": {
+            "replacements": "Quote strings and newlines"
+        },
+    }
+``` 
+
+Now the replacer can be used both from the menu and via the keyboard shortcut.
+
+## A Canned Text Example
+
+During a [Joyride](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.joyride) (a scripting extension for VS Code) demo. I wanted to be able to type a ”Hello World” snippet quickly:
 
 ```clojure
 (vscode/window.showInformationMessage "Hello World!")
 ```
 
-And `_hw2` with
+And also a slighly more involved snippet:
 
 ```clojure
 (p/let [choice (vscode/window.showInformationMessage "Be a Joyrider 🎸" "Yes" "Of course!")]
@@ -81,118 +147,28 @@ This configuration defines the replacers:
 
 ```json
     "paste-replaced.replacers": [
-        [
-            [
-                "^_hw2$",
-                "(p/let [choice (vscode/window.showInformationMessage \"Be a Joyrider 🎸\" \"Yes\" \"Of course!\")]\n (if choice\n (.appendLine (joyride/output-channel) (str \"You choose: \" choice \" 🎉\"))\n (.appendLine (joyride/output-channel) \"You just closed it? 😭\")))"
-            ],
-            [
-                "^_hw$",
-                "(vscode/window.showInformationMessage \"Hello World!\")"
-            ],
-        ]
+        ...
+        {
+            "name": "Hello world Joyride",
+            "replacements": "(vscode/window.showInformationMessage \"Hello World!\")",
+            "simulateTypingSpeed": "fast"
+        },
+        {
+            "name": "Some more Joyride code",
+            "replacements": "(p/let [choice (vscode/window.showInformationMessage \"Be a Joyrider 🎸\" \"Yes\" \"Of course!\")]\n  (if choice\n    (.appendLine (joyride/output-channel) (str \"You choose: \" choice \" 🎉\"))\n    (.appendLine (joyride/output-channel) \"You just closed it? 😭\")))",
+            "simulateTypingSpeed": "fast"
+        },
+        ...
     ],
 ``` 
 
-(The reason `_hw2` is defined before `_hw` is that despite the anchoring, `_hw` would otherwise be replaced when using `_hw2`. I don't understand why. Might be a bug.)
+Here I've added the `"simulateTypingSpeed": "fast"` to the replacers to make it a bit more like I am typing the code fast. (And guess how I quoted and pasted that `replacements` code! 😀)
 
-Then in the code editor or in some input box I would type, say `_hw`, then press:  <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd> (Hold down <kbd>Ctrl</kbd>+<kbd>Alt</kbd>, then press <kbd>V</kbd>, twice). The result is that `_hw` will be replaced by `(vscode/window.showInformationMessage "Hello World!")`. 
+To use it I bring up the **Paste Replaced...** menu, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd> <kbd>SPACE</kbd>:
 
+![](assets/paste-replaced-menu.png)
 
-## Another Paste Clipboard Replaced Example
-
-(This one is quite contrived...)
-
-With these settings:
-
-```js
-    "paste-replaced.replacers": [
-        [
-            [".", "♥️", "g"],
-            ["♥️", "💪"],    
-            ["♥️$", "💪"],
-        ],
-        [
-            ["\\.", "/", "g"],
-            ["-", "_", "i"]    
-        ],
-    ],
-```
-
-And you have this text copied:
-
-```
-I love you!
-```
-
-Then if you **Paste Replaced: Paste** <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>V</kbd>, you will paste:
-
-```
-💪♥️♥️♥️♥️♥️♥️♥️♥️♥️💪
-```
-
-## Yet another Paste Clipboard Replaced Example
-
-With these settings:
-
-```js
-    "paste-replaced.replacers": [
-        [
-            ["\\.", "/", "g"],
-            ["-", "_", "g"]    
-        ],
-        [
-            [".", "♥️", "g"],
-            ["♥️", "💪"],    
-            ["♥️$", "💪"],
-        ],
-    ],
-```
-
-And you have this text selected:
-
-```clojure
-pez.sandbox-labs.sicp.heron-sqrt
-```
-
-Then: **Paste Replace: Pastee** will give you:
-
-```
-pez/sandbox_labs/sicp/heron_sqrt
-```
-
-This particular example is converting a Clojure namespace to a file path segment matching the file defining the namespace. So if you have a Clojure project and a Clojure namespace you can quickly open the file like so:
-
-![Paste Clojure NS as Path](assets/paste-clojure-ns-replaced.gif)
-
-## Yet another example
-
-Last one, promise!
-
-Say you want to be able to write ”bare” url fragments in Markdown documents and easily convert them to proper links with `https://` prepended to the url part. Easy peasy!
-
-```js
-    "paste-replaced.replacers": [
-        [ // hostname/path -> Markdown url
-            [".*", "[$&](https://$&)"],
-        ],
-        [ // Clojure namespace -> file path segment
-            ["\\.", "/", "g"],
-            ["-", "_", "g"],
-        ],
-        ...
-    ]
-```
-
-![Paste Bare URL as Markdown Link](assets/paste-markdown-url-replaced.gif)
-
-## Your examples
-
-I've created a [gist for collecting examples](https://gist.github.com/PEZ/676706cdea7fdd24f23d92127fd2b3e2). Please consider adding your uses of this extension there!
-
-## Why an array of arrays of tuples?
-
-You might have guessed it already. Since the extension only uses the first one you can use the rest of the array as a repository of nifty `Replacers`.
+From there I can select which canned code to paste (type fast). This menu remembers what was selected last, so in the real demo I had many canned examples and could easily type next, and then next, and so on.
 
 ## It's Node.js Regexes
 
