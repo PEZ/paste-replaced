@@ -12,6 +12,14 @@ Paste Clipboard or selections with configurable edits/replacements. And simulate
 * Copy package/namespace strings and paste as paths in the 
 * Spiff up your presentations by quickly inserting canned text anywhere in VS Code.
 
+## Demo GIF
+
+Here I cut out some code and Paste Replace it in the `settings.json`. Then I use that setting to paste the code back again into the document. Then I paste it into the [Joyride](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.joyride) **Run Clojure Code** input box and run it.
+
+![4E3E99F7-F8DB-4D23-941A-44B3BD4A00D3-74123-0002EA8F1355DA0C](https://user-images.githubusercontent.com/30010/197882952-488ccc29-4866-44bf-b68a-24166ed190a7.gif)
+
+See the examples below for how this was configured.
+
 ## Features
 
 * Configure **replacers** as a series of regular expressions
