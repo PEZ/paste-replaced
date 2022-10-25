@@ -36,7 +36,7 @@ To  populate the menu you need to configure `paste-replaced.replacers`. To use r
 Setting | Type | Description
 --- | --- | ---
 `name` | `string` | Used in the **Paste Replaced: Paste...** menu and when referencing the replacer in a keyboard shortcut.
-`replacements` | `array` of tuples:<br>  `[search, replace_with, flags?]`<br> _or_ `string` | The tuples will be compiled to regular expressions, and applied to the text in the order they appear in the array. If a string is given, it will be pasted as it is, regardless of what is on the clipboard.
+`replacements` | `array` of tuples:<br>  `[search, replace_with, flags?]` | The tuples will be compiled to regular expressions, and applied to the text in the order they appear in the array.
 `simulateTypingSpeed` | `enum`:<br> `"instant"`, `"fast"`, `"intermediate"`, `"slow"` | If set to `"instant"`, no typing simulation will be applied, otherwise simulate typing of configured speed.
 `skipPaste`| `boolean` | If set to `true`, the replaced text will stay on the clipboard and not be pasted.
 
@@ -49,6 +49,10 @@ newText = text.replace(new RegExp(search, flags), replace_with)
 (I've switched the order of the arguments, because it makes more sense to me, and because the flags are optional.)
 
 **NB**: Watch for terminology used above. A **replacer** is an entry in the **Paste Replace: Paste...** menu, or provided as the argument to the `paste-replaced.paste` command in keyboard shortcuts. A **replacer** has **replacements**, that array of regex tuples.
+
+### Keyboard shortcuts replacers
+
+A keyboard shortcut replacer (args to `paste-replaced.paste`) can also be a string. In this case it will be referring to replacer configured in settings. See examples below.
 
 ## A Paste Clipboard Replaced Example
 
@@ -118,13 +122,11 @@ You can make shortcuts referencing replacers configured in settings.json, to kee
     {
         "command": "paste-replaced.paste",
         "key": "ctrl+alt+v q",
-        "args": {
-            "replacements": "Quote strings and newlines"
-        },
+        "args": "Quote strings and newlines",
     }
 ``` 
 
-Now the replacer can be used both from the menu and via the keyboard shortcut.
+Now the same replacer can be used both from the menu and via the keyboard shortcut.
 
 ## A Canned Text Example
 

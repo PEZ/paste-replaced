@@ -1,5 +1,6 @@
 (ns paste-replaced.replacer
   (:require ["vscode" :as vscode]
+            ["open" :as open]
             [paste-replaced.db :as db]
             [paste-replaced.quick-pick :as qp]
             [paste-replaced.utils :refer [cljify jsify]]
@@ -144,12 +145,19 @@
           choice (qp/quick-pick!+ (jsify menu-items) {:title "Choose replacer"} "replacers")]
     (cljify choice)))
 
-(defn- named-from-picker-or-first!+ [all-replacers]
+(defn- show-readme-message+ [msg]
+  (-> (vscode/window.showWarningMessage msg "Open README")
+                           (.then
+                            (fn [button]
+                              (when button
+                                (open "https://github.com/PEZ/paste-replaced#paste-replaced"))))))
+
+(defn- named-from-picker!+ [all-replacers]
   (p/let [named-replacers (filter #(and (map? %)
                                         (:name %)) all-replacers)
           replacer (if (< 0 (count named-replacers))
                      (show-replacers-picker!+ named-replacers)
-                     (first all-replacers))]
+                     (show-readme-message+ "No named replacers found."))]
     (:replacer replacer)))
 
 (defn- pick-replacer!+
@@ -170,12 +178,12 @@
     (-> provided-replacer cljify map?)
     (if (-> provided-replacer cljify :replacements)
       (cljify provided-replacer)
-      (named-from-picker-or-first!+ all-replacers))
+      (named-from-picker!+ all-replacers))
 
     (nil? provided-replacer)
     (if (and all-replacers (> (count all-replacers) 0))
-      (named-from-picker-or-first!+ all-replacers)
-      (vscode/window.showWarningMessage "No replacers configured?"))
+      (named-from-picker!+ all-replacers)
+      (show-readme-message+ "No replacers configured?"))
 
     :else
     (vscode/window.showErrorMessage "Malformed replacer provided")))
@@ -192,10 +200,10 @@
                                        (.inspect "replacers")
                                        (cljify))
              all-replacers (into (:workspaceValue all-replacers-configs)
-                                 (:globalValue all-replacers-configs))]
-       (p/let [replacer (pick-replacer!+ provided-replacer all-replacers)]
-         (when replacer
-           (paste-replaced-using-replacer!+ replacer))))
+                                 (:globalValue all-replacers-configs))
+             replacer (pick-replacer!+ provided-replacer all-replacers)]
+       (when replacer
+         (paste-replaced-using-replacer!+ replacer)))
      (catch :default error
        (.error js/console error)
        (vscode/window.showErrorMessage (str "Paste Replaced failed: "

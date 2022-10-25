@@ -158,7 +158,8 @@
     "vscode:prepublish": "npm run clean && npm run release"
   },
   "dependencies": {
-    "@vscode/codicons": "^0.0.30"
+    "@vscode/codicons": "^0.0.30",
+    "open": "^8.4.0"
   },
   "devDependencies": {
     "rimraf": "^3.0.2",
