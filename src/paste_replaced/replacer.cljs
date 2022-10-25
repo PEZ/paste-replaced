@@ -153,7 +153,7 @@
     (:replacer replacer)))
 
 (defn- pick-replacer!+
-  [provided-replacer all-replacers]
+  [^js provided-replacer all-replacers]
   (cond
     (string? provided-replacer)
     (let [found-replacer (->> all-replacers
