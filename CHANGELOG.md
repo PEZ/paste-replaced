@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [1.1.5] - 2022-10-25
+
 - Fix bug with referencing named replacers
 - Add OPEN README message when opening menu with no valid replacers are configured
 
