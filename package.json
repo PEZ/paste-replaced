@@ -109,7 +109,7 @@
                 },
                 "skipPaste": {
                   "type": "boolean",
-                  "markdownDescription": "Should the resulting text be pasted? If not, it will only be copied to the clipboard.",
+                  "markdownDescription": "Should we skip pasting the resulting text? It will only be copied to the clipboard.",
                   "default": false
                 }
               },
@@ -135,6 +135,11 @@
               "Slowly type the text in"
             ],
             "default": "instant"
+          },
+          "paste-replaced.skipPaste": {
+            "type": "boolean",
+            "markdownDescription": "Should we skip pasting the resulting text? It will only be copied to the clipboard.",
+            "default": false
           }
         }
       }

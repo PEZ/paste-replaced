@@ -78,6 +78,22 @@
 (defn- compile-regex [r]
   [(js/RegExp. (r 0) (get r 2 "")) (r 1)])
 
+(defn- skip-paste-for-replacer?
+  [replacer]
+  (cond
+    (boolean? (:skipPaste replacer))
+    (:skipPaste replacer)
+
+    :else
+    (-> (vscode/workspace.getConfiguration "paste-replaced")
+        (.get "skipPaste"))))
+
+(defn- simulate-typing-config-for-replacer
+  [replacer]
+  (or (:simulateTypingSpeed replacer)
+      (-> (vscode/workspace.getConfiguration "paste-replaced")
+          (.get "simulateTypingSpeed"))))
+
 (defn- paste-replaced-using-replacer!+
   [replacer]
   (p/let [replacers (map
@@ -91,29 +107,34 @@
                              (.replace acc s r))
                            original-clipboard-text
                            replacers)
-          simulate-typing-config (or (:simulateTypingSpeed replacer)
-                                     (-> (vscode/workspace.getConfiguration "paste-replaced")
-                                         (.get "simulateTypingSpeed")))]
+          simulate-typing-config (simulate-typing-config-for-replacer replacer)
+          skip-paste? (skip-paste-for-replacer? replacer)]
     (typing!+ true)
     (if (= simulate-typing-config "instant")
       (p/do! (vscode/env.clipboard.writeText new-text)
-             (when-not (:skipPaste replacer)
+             (when-not skip-paste?
                (vscode/commands.executeCommand "execPaste")))
-      (if (:skipPaste replacer)
+      (if skip-paste?
         (vscode/env.clipboard.writeText new-text)
         (simulate-typing new-text simulate-typing-config)))
-    (when-not (:skipPaste replacer)
+    (if skip-paste?
+      (vscode/window.showInformationMessage "Replaced text copied to the clipboard.")
       (vscode/env.clipboard.writeText original-clipboard-text))
     (typing!+ false)))
 
 (defn- show-replacers-picker!+
   [replacers]
   (p/let [menu-items (mapv (fn [r]
-                             (merge r
-                                    {:label (:name r)
-                                     :replacer r}
-                                    (when (:simulateTypingSpeed r)
-                                      {:description (:simulateTypingSpeed r)})))
+                             (cond-> r
+                               :always 
+                               (assoc :label (:name r)
+                                              :replacer r)
+                               
+                               (simulate-typing-config-for-replacer r)
+                               (assoc :description (simulate-typing-config-for-replacer r))
+                               
+                               (skip-paste-for-replacer? r)
+                               (assoc :description "skip paste")))
                            replacers)
           choice (qp/quick-pick!+ (jsify menu-items) {:title "Choose replacer"} "replacers")]
     (cljify choice)))
