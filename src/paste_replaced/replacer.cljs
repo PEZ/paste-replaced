@@ -199,9 +199,13 @@
      (p/let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
                                        (.inspect "replacers")
                                        (cljify))
-             all-replacers (into (:workspaceValue all-replacers-configs)
+             all-replacers (into (vec (:workspaceValue all-replacers-configs))
                                  (:globalValue all-replacers-configs))
-             replacer (pick-replacer!+ provided-replacer all-replacers)]
+             replacer (pick-replacer!+ (if (and (nil? provided-replacer)
+                                                (every? vector? all-replacers))
+                                         (first all-replacers) 
+                                         provided-replacer) 
+                                       all-replacers)]
        (when replacer
          (paste-replaced-using-replacer!+ replacer)))
      (catch :default error
