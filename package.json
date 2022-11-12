@@ -2,7 +2,7 @@
   "name": "paste-replaced",
   "displayName": "Paste Replaced",
   "description": "Paste text replaced using regular expressions that you configure, optionally simulating that you are typing it. Works anywhere in VS Code, not just the editors. E.g. ood for fast typing canned text in your presentations and a lot of other cases.",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "publisher": "betterthantomorrow",
   "author": {
     "name": "Peter Strömberg",
