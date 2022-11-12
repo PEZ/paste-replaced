@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+- Fix bug with command **Copy Selected Text and Paste** not working in most cases
+
 ## [1.1.7] - 2022-11-12
 
 - Actually fix bug with backward compatability with old config format 🤦
