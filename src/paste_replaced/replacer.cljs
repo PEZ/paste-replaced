@@ -160,7 +160,7 @@
                      (show-readme-message+ "No named replacers found."))]
     (:replacer replacer)))
 
-(defn- pick-replacer!+
+(defn- choose-replacer!+
   [^js provided-replacer all-replacers]
   (cond
     (string? provided-replacer)
@@ -182,11 +182,21 @@
 
     (nil? provided-replacer)
     (if (and all-replacers (> (count all-replacers) 0))
-      (named-from-picker!+ all-replacers)
+      (if (every? vector? all-replacers)
+        (first all-replacers)
+        (named-from-picker!+ all-replacers))
       (show-readme-message+ "No replacers configured?"))
 
     :else
     (vscode/window.showErrorMessage "Malformed replacer provided")))
+
+(defn- all-configured-replacers []
+  (let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
+                                  (.inspect "replacers")
+                                  (cljify))
+        all-replacers (into (vec (:workspaceValue all-replacers-configs))
+                            (:globalValue all-replacers-configs))]
+    all-replacers))
 
 (defn paste-replaced!+
   "Pastes what is on the Clipboard and pastes it with the replacers
@@ -196,16 +206,8 @@
    (paste-replaced!+ nil))
   ([provided-replacer]
    (try
-     (p/let [all-replacers-configs (-> (vscode/workspace.getConfiguration "paste-replaced")
-                                       (.inspect "replacers")
-                                       (cljify))
-             all-replacers (into (vec (:workspaceValue all-replacers-configs))
-                                 (:globalValue all-replacers-configs))
-             replacer (pick-replacer!+ (if (and (nil? provided-replacer)
-                                                (every? vector? all-replacers))
-                                         (first all-replacers) 
-                                         provided-replacer) 
-                                       all-replacers)]
+     (p/let [all-replacers (all-configured-replacers)
+             replacer (choose-replacer!+ provided-replacer all-replacers)]
        (when replacer
          (paste-replaced-using-replacer!+ replacer)))
      (catch :default error
@@ -226,13 +228,14 @@
    With no `selectCommandId`, the current selection is used."
   ([]
    (select-and-paste-replaced!+ nil))
-  ([^js command-args]
-   (p/let [command-id (when command-args (.-selectCommandId command-args))
-           original-clipboard-text (vscode/env.clipboard.readText)]
-     (when command-args
-       (when command-id
-         (vscode/commands.executeCommand command-id)))
-     (vscode/commands.executeCommand  "execCopy")
-     (paste-replaced!+ command-args)
-     (when-not (.-skipPaste command-args)
-       (vscode/env.clipboard.writeText original-clipboard-text)))))
+  ([^js provided-replacer]
+   (p/let [original-clipboard-text (vscode/env.clipboard.readText)
+           all-replacers (all-configured-replacers)
+           replacer (choose-replacer!+ provided-replacer all-replacers)
+           command-id (some-> replacer :selectCommandId)]
+     (when command-id
+       (vscode/commands.executeCommand command-id))
+     (vscode/commands.executeCommand "execCopy")
+     (when-not (skip-paste-for-replacer? replacer)
+       (p/do (paste-replaced!+ replacer)
+             (vscode/env.clipboard.writeText original-clipboard-text))))))
