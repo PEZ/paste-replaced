@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [1.1.7] - 2022-11-12
+
 - Actually fix bug with backward compatability with old config format 🤦
 
 ## [1.1.6] - 2022-11-12
