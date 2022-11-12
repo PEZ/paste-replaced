@@ -4,6 +4,10 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [1.1.6] - 2022-11-12
+
+- Fix bug with backward compatability with old config format
+
 ## [1.1.5] - 2022-10-25
 
 - Fix bug with referencing named replacers
@@ -11,6 +15,7 @@ Changes to Paste Replaced
 
 ## [1.1.4] - 2022-10-25
 
+- Changed default paste-replaced keyboard shortcut to `ctrl+alt+v space`
 - Add Paste Replace... menu
 - Generalize Select and Paste Replace
 - Add `simulateTypingSpeed` local config to **replacers**
