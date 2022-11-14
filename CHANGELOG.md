@@ -4,6 +4,11 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+Internal stuff:
+
+- Catch any activation errors.
+- Avoid deprecated API Call.
+
 ## [1.1.8] - 2022-11-12
 
 - Fix bug with command **Copy Selected Text and Paste** not working in most cases
