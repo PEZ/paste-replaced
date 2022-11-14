@@ -66,7 +66,7 @@
           (fn [c]
             (when-not (:typing-interrupted? @db/!app-db)
               (p/do! (vscode/env.clipboard.writeText c)
-                     (vscode/commands.executeCommand "execPaste")
+                     (vscode/commands.executeCommand "editor.action.clipboardCopyAction")
                      (p/create
                       (fn [resolve, _reject]
                         (js/setTimeout resolve
@@ -119,7 +119,7 @@
     (if (= simulate-typing-config "instant")
       (p/do! (vscode/env.clipboard.writeText new-text)
              (when-not skip-paste?
-               (vscode/commands.executeCommand "execPaste")))
+               (vscode/commands.executeCommand "editor.action.clipboardCopyAction")))
       (if skip-paste?
         (vscode/env.clipboard.writeText new-text)
         (simulate-typing new-text simulate-typing-config)))
@@ -235,7 +235,7 @@
            command-id (some-> replacer :selectCommandId)]
      (when command-id
        (vscode/commands.executeCommand command-id))
-     (vscode/commands.executeCommand "execCopy")
+     (vscode/commands.executeCommand "editor.action.clipboardCopyAction")
      (when-not (skip-paste-for-replacer? replacer)
        (p/do (paste-replaced!+ replacer)
              (vscode/env.clipboard.writeText original-clipboard-text))))))
