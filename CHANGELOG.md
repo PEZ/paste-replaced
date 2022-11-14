@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [1.1.9] - 2022-11-14
+
 Internal stuff:
 
 - Catch any activation errors.
