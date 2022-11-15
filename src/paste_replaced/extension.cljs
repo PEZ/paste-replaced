@@ -2,7 +2,7 @@
   (:require ["vscode" :as vscode]
             [paste-replaced.db :as db]
             [paste-replaced.replacer :as replacer]
-            [paste-replaced.utils :as utils :refer [info jsify]]
+            [paste-replaced.utils :as utils :refer [info jsify cljify]]
             [paste-replaced.when-contexts :as when-contexts]
             [promesa.core :as p]))
 
@@ -26,7 +26,7 @@
     (swap! db/!app-db assoc
            :output-channel (vscode/window.createOutputChannel "Paste Replaced")
            :extension-context context
-           :workspace-root-path (some-> (js->clj vscode/workspace.workspaceFolders :keywordize-keys true)
+           :workspace-root-path (some-> (cljify vscode/workspace.workspaceFolders)
                                         first)
            :typing-interrupted? false)
     (utils/sayln "Paste Replace activating..."))
