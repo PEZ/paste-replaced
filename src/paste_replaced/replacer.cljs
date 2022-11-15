@@ -66,7 +66,7 @@
           (fn [c]
             (when-not (:typing-interrupted? @db/!app-db)
               (p/do! (vscode/env.clipboard.writeText c)
-                     (vscode/commands.executeCommand "editor.action.clipboardCopyAction")
+                     (vscode/commands.executeCommand "editor.action.clipboardPasteAction")
                      (p/create
                       (fn [resolve, _reject]
                         (js/setTimeout resolve
