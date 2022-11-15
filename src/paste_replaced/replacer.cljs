@@ -119,7 +119,7 @@
     (if (= simulate-typing-config "instant")
       (p/do! (vscode/env.clipboard.writeText new-text)
              (when-not skip-paste?
-               (vscode/commands.executeCommand "editor.action.clipboardCopyAction")))
+               (vscode/commands.executeCommand "editor.action.clipboardPasteAction")))
       (if skip-paste?
         (vscode/env.clipboard.writeText new-text)
         (simulate-typing new-text simulate-typing-config)))
