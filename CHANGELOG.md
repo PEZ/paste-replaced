@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+- [Fix the extension not working on non-Macs](https://github.com/PEZ/paste-replaced/issues/4), thanks @KcZer0 and @AndrewRocky! 🙏
+
 ## [1.1.9] - 2022-11-14
 
 Internal stuff:
