@@ -51,6 +51,8 @@ You can use the **Paste Replaced: Paste..** menu, and/or you can configure keybo
 
 To  populate the menu you need to configure `paste-replaced.replacers`. To use replacers from keyboard shortcuts, you bind keys to the `paste-replaced.paste` command provding a replacer. In both cases the replacers look like so:
 
+### Replacer
+
 Setting | Type | Description
 --- | --- | ---
 `name` | `string` | Used in the **Paste Replaced: Paste...** menu and when referencing the replacer in a keyboard shortcut.
@@ -119,12 +121,12 @@ You can also configure the replacer as a `paste-replaced.replacers` configuratio
 ``` json
     "paste-replaced.replacers": [
         {
-            "name": "Quote strings and newlines",
+            "name": "Quote strings and squash whitespace",
             "replacements": [
                 [ "\"", "\\\"", "g" ],
-                [ " +", " ", "g" ],
                 [ "\n", "\\n", "g" ],
-            ]
+                [ "\\s+", " ", "g" ],
+            ],
         },
         ...
     ],
@@ -140,13 +142,29 @@ You can make shortcuts referencing replacers configured in settings.json, to kee
     {
         "command": "paste-replaced.paste",
         "key": "ctrl+alt+v q",
-        "args": "Quote strings and newlines",
+        "args": "Quote strings and squash whitespace",
     }
 ``` 
 
 Now the same replacer can be used both from the menu and via the keyboard shortcut.
 
-## A Canned Text Example
+## Canned Text
+
+There are basically two facilities for canned text:
+
+* A command **Paste Replaced: Paste From Canned...**
+* A command **Paste Replaced: Paste Text...**
+
+**Paste Canned** will bring up a menu of your configured canned texts. You configure the canned text in a (kind of) [EDN](https://learnxinyminutes.com/docs/edn/) (a bit like a much, much better JSON) file. The default location for this file is at the workspace root, named `paste-replaced-canned.edn` (configurable from settings). The format is that this file should consist of a vector (like a JS array) of maps (like a JS object), where each map has two entries:
+
+* `:name`, a string with the name to show in the canned texts menu
+* `:text`, a string with the canned text, or a piece of Clojure code or EDN (this is what makes it a kind of an EDN file, because EDN can't host all Clojure code)
+
+By default the command brings up two menu's, one for selecting canned text, and one for selecting a preconfigured [replacer](#replacer). To skip the replacer menu, you can configure a Keyboard Shortcut for the command `paste-replaced.pasteCanned` and provide a [replacer](#replacer) as `args`. See an example below.
+
+**Paste Text** is not meant to be used from the Command Palette, but from configured Keyboard Shortcuts, where you provide the text to be pasted. See examples below.
+
+### A Paste Canned Example
 
 During a [Joyride](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.joyride) (a scripting extension for VS Code) demo. I wanted to be able to type a ”Hello World” snippet quickly:
 
@@ -154,7 +172,7 @@ During a [Joyride](https://marketplace.visualstudio.com/items?itemName=bettertha
 (vscode/window.showInformationMessage "Hello World!")
 ```
 
-And also a slighly more involved snippet:
+And also a slightly more involved snippet:
 
 ```clojure
 (p/let [choice (vscode/window.showInformationMessage "Be a Joyrider 🎸" "Yes" "Of course!")]
@@ -163,32 +181,88 @@ And also a slighly more involved snippet:
     (.appendLine (joyride/output-channel) "You just closed it? 😭")))
 ```
 
-This configuration defines the replacers:
+This configuration defines the canned text:
 
-```json
-    "paste-replaced.replacers": [
-        ...
-        {
-            "name": "Hello world Joyride",
-            "replacements": "(vscode/window.showInformationMessage \"Hello World!\")",
-            "simulateTypingSpeed": "fast"
-        },
-        {
-            "name": "Some more Joyride code",
-            "replacements": "(p/let [choice (vscode/window.showInformationMessage \"Be a Joyrider 🎸\" \"Yes\" \"Of course!\")]\n  (if choice\n    (.appendLine (joyride/output-channel) (str \"You choose: \" choice \" 🎉\"))\n    (.appendLine (joyride/output-channel) \"You just closed it? 😭\")))",
-            "simulateTypingSpeed": "fast"
-        },
-        ...
-    ],
+```clojure
+[{:name "Plain text"
+  :text "This is a canned text.
+It has several lines,
+and a \"quoted\" word."}
+ {:name "Joyride: Hello World"
+  :text (vscode/window.showInformationMessage "Hello World!")}
+ {:name "Joyride: Are you a Joyrider?"
+  :text (p/let [choice (vscode/window.showInformationMessage "Be a Joyrider 🎸" "Yes" "Of course!")]
+          (if choice
+            (.appendLine (joyride/output-channel) (str "You choose: " choice " 🎉"))
+            (.appendLine (joyride/output-channel) "You just closed it? 😭")))}]
 ``` 
 
-Here I've added the `"simulateTypingSpeed": "fast"` to the replacers to make it a bit more like I am typing the code fast. (And guess how I quoted and pasted that `replacements` code! 😀)
+ Note that since it is Clojure code I can paste it as is, fully readable. If it would be some other language, you would need to use strings. These can be multiline though, so still better than JSON (and Paste Replaced can help you quote stuff).
 
-To use it I bring up the **Paste Replaced...** menu, <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd> <kbd>SPACE</kbd>:
+Using the command **Paste Replace: Paste From Canned...** brings up this menu:
 
-![](assets/paste-replaced-menu.png)
+![Paste Replaced Canned Texts Menu](assets/paste-replaced-canned-menu.png)
 
-From there I can select which canned code to paste (type fast). This menu remembers what was selected last, so in the real demo I had many canned examples and could easily type next, and then next, and so on.
+And selecting an item from this list, brings up the replacers menu. Selecting a replacer will paste the selected text using that replacer. To skip the replacer menu, we can configure keyboard shortcuts:
+
+```json
+    {
+        "command": "paste-replaced.pasteCanned",
+        "key": "ctrl+alt+v i",
+        "args": [],
+    },
+    {
+        "command": "paste-replaced.pasteCanned",
+        "key": "ctrl+alt+v f",
+        "args": {
+            "replacements": [],
+            "simulateTypingSpeed": "fast"
+        },
+    },
+```
+
+As mentioned above, the `args` for this command is a [replacer](#replacer). I don't want any replacements performed, so I provide an empty vector of replacements. The `ctrl+alt+v i` binding utilizes the fact that a replacer can be just a vector of replacements. For the `ctrl+alt+v f` binding I want a simulated (fast) typing speed, so I need to use the object format for the replacer.
+
+### Paste Text examples
+
+To paste a particular text with a keyboard shortcut you can bind to the command `paste-replaced.pasteText`, and provide the text as `args`.
+
+```json
+    {
+        "command": "paste-replaced.pasteText",
+        "key": "ctrl+alt+v 1",
+        "args": "\"Hello   world! 1\"",
+    },
+```
+
+This will paste it instantly and without any replacing. You can place the string in a vector to bring up the replacers menu before the pasting happens:
+
+```json
+    {
+        "command": "paste-replaced.pasteText",
+        "key": "ctrl+alt+v 2",
+        "args": ["\"Hello   world! 2\""],
+    },
+```
+
+You can specify a [replacer](#replacer) as a second entry in that vector:
+
+```json
+    {
+        "command": "paste-replaced.pasteText",
+        "key": "ctrl+alt+v 3",
+        "args": [
+            "Hello    world! 3    ",
+            {
+                "replacements": [
+                    [ "\\s+", " ", "g"],
+                    [ "\\s*$", ""]
+                ],
+                "simulateTypingSpeed": "instant"
+            }
+        ],
+    },
+```
 
 ## It's Node.js Regexes
 

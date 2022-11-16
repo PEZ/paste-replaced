@@ -46,7 +46,7 @@
       {
         "command": "paste-replaced.pasteCanned",
         "category": "Paste Replaced",
-        "title": "Paste from Texts..."
+        "title": "Paste From Canned..."
       },
       {
         "command": "paste-replaced.pasteText",
