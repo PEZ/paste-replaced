@@ -4,6 +4,10 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+- Add command **Paste Replaced: Paste From Canned...**
+- Add command **Paste Replaced: Paste Text...**
+- Add some more error handling
+
 ## [1.1.10] - 2022-11-15
 
 - [Fix the extension not working on non-Macs](https://github.com/PEZ/paste-replaced/issues/4), thanks @KcZer0 and @AndrewRocky! 🙏
