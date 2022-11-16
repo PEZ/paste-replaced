@@ -27,7 +27,7 @@
   {"fast" {:char 0
            :space 0
            :nl 350
-           :description "Typed as a really fast keyboard weilder"}
+           :description "Typed as a really fast keyboard wielder"}
    "intermediate" {:char 75
                    :space 250
                    :nl 1300
