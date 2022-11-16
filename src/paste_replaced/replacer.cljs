@@ -271,11 +271,6 @@
          (p/do (paste-replaced!+ replacer)
                (vscode/env.clipboard.writeText original-clipboard-text)))))))
 
-(defn- js-stringify [x]
-  (-> x
-      jsify
-      js/JSON.stringify))
-
 (defn paste-replaced-text!+
   "For pasting a provided text string.
    If `args` is missing, will show a information message about configuring a shortcut.
@@ -289,7 +284,7 @@
      (paste-replaced-text-impl!+ args [])
      (let [clj-args (cljify args)]
        (if (vector? clj-args)
-         (apply paste-replaced-text-impl!+ (update clj-args 0 js-stringify))
+         (apply paste-replaced-text-impl!+ (update clj-args 0 str))
          (show-readme-message+ "`args` to paste-replaced.pasteText needs to be a string or a tuple `[text, replacer]`."))))))
 
 (defn paste-replaced-canned!+
