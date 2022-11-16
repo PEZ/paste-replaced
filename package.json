@@ -76,14 +76,8 @@
         "when": "paste-replaced.isTyping"
       },
       {
-        "command": "paste-replaced.pasteCanned",
-        "key": "ctrl+alt+v t",
-        "args": null
-      },
-      {
         "command": "paste-replaced.pasteSelectionReplaced",
-        "key": "ctrl+alt+v s",
-        "args": null
+        "key": "ctrl+alt+v s"
       }
     ],
     "configuration": [
