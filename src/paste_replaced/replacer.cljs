@@ -3,9 +3,11 @@
             ["open" :as open]
             [paste-replaced.db :as db]
             [paste-replaced.quick-pick :as qp]
-            [paste-replaced.utils :refer [cljify jsify]]
+            [paste-replaced.utils :as utils :refer [cljify jsify]]
             [paste-replaced.when-contexts :as when-contexts]
-            [promesa.core :as p]))
+            [promesa.core :as p]
+            [cljs.tools.reader :as tr]
+            [clojure.walk :as walk]))
 
 (defn gaussian-rand'
   []
@@ -132,25 +134,36 @@
   [replacers]
   (p/let [menu-items (mapv (fn [r]
                              (cond-> r
-                               :always 
+                               :always
                                (assoc :label (:name r)
-                                              :replacer r)
-                               
+                                      :replacer r)
+
                                (simulate-typing-config-for-replacer r)
                                (assoc :description (simulate-typing-config-for-replacer r))
-                               
+
                                (skip-paste-for-replacer? r)
                                (assoc :description "skip paste")))
                            replacers)
           choice (qp/quick-pick!+ (jsify menu-items) {:title "Choose replacer"} "replacers")]
     (cljify choice)))
 
+(defn- show-texts-picker!+
+  [texts]
+  (p/let [menu-items (mapv (fn [t]
+                             (assoc t :label (:name t)))
+                           texts)
+          choice (qp/quick-pick!+ (jsify menu-items) {:title "Choose text"} "texts")
+          clj-choice (cljify choice)]
+    (if (vector? clj-choice)
+      (first clj-choice)
+      clj-choice)))
+
 (defn- show-readme-message+ [msg]
-  (-> (vscode/window.showWarningMessage msg "Open README")
-                           (.then
-                            (fn [button]
-                              (when button
-                                (open "https://github.com/PEZ/paste-replaced#paste-replaced"))))))
+  (-> (vscode/window.showInformationMessage msg "Open README")
+      (.then
+       (fn [button]
+         (when button
+           (open "https://github.com/PEZ/paste-replaced#paste-replaced"))))))
 
 (defn- named-from-picker!+ [all-replacers]
   (p/let [named-replacers (filter #(and (map? %)
@@ -217,6 +230,83 @@
        (typing!+ false)
        (throw (js/Error. (str "Paste Replaced failed: "
                               error)))))))
+
+(defn- single-quote-second
+  [x]
+  (if (symbol? (second x))
+    (symbol (str \' (second x)))
+    (str \' (second x))))
+
+(defn- str-text [text-item]
+  (if (= (type "")
+         (type (:text text-item)))
+    text-item
+    (update text-item
+            :text (fn [text]
+                    (str (walk/postwalk
+                          (fn [node]
+                            (cond-> node
+                              (and (seq? node)
+                                   (= 'quote (first node))) single-quote-second))
+                          text))))))
+
+(defn- paste-replaced-text-impl!+
+  ([text]
+   (paste-replaced-text-impl!+ text []))
+  ([text provided-replacer]
+   (p/let [original-clipboard-text (vscode/env.clipboard.readText)
+           all-replacers (all-configured-replacers)
+           replacer (choose-replacer!+ provided-replacer all-replacers)]
+     (when replacer
+       (vscode/env.clipboard.writeText text)
+       (when-not (skip-paste-for-replacer? replacer)
+         (p/do (paste-replaced!+ replacer)
+               (vscode/env.clipboard.writeText original-clipboard-text)))))))
+
+(defn paste-replaced-text!+
+  "For pasting a provided text string.
+   If `args` is missing, will show a information message about configuring a shortcut.
+   If `args` is a string, will paste that string un-modified.
+   If `args` is an array, expects it to be a tuple `[text, replacer]`
+   If `replacer` is `null`, will present a menu of configured replacers."
+  ([]
+   (show-readme-message+ "This command can only be used via a configured Keyboard Shortcut."))
+  ([^js args]
+   (if (string? args)
+     (paste-replaced-text-impl!+ args [])
+     (let [clj-args (cljify args)]
+       (if (vector? clj-args)
+         (apply paste-replaced-text-impl!+ (update clj-args 0 str))
+         (show-readme-message+ "`args` to paste-replaced.pasteText needs to be a string or a tuple `[text, replacer]`."))))))
+
+(defn paste-replaced-from-texts!+
+  "Presents a menu from the text items in the EDN file `texts-file`.
+   Pastes the selected text using `provided-replacer`.
+   `texts-file` defaults to `<workspace-root>/paste-replaced-texts.edn`
+   `provided-replacer` defaults to no replacements.
+   Providing a `nil` replacer will show a replacers menu."
+  ([]
+   (paste-replaced-from-texts!+ #js {:replacements #js []}))
+  ([provided-replacer]
+   (p/let [config-file (-> (vscode/workspace.getConfiguration "paste-replaced")
+                           (.get "texts-file"))]
+     (paste-replaced-from-texts!+ provided-replacer config-file)))
+  ([provided-replacer texts-file]
+   (p/let [file-exists? (if texts-file
+                          (utils/path-or-uri-exists?+ texts-file)
+                          (throw (js/Error. "No texts-file provided")))
+           texts (if file-exists?
+                   (p/-> texts-file
+                         (utils/vscode-read-uri+)
+                         (tr/read-string)
+                         (p/->>
+                          (mapv str-text))
+                         (p/catch (fn [e]
+                                    (throw (js/Error "Error reading texts file" e)))))
+                   (throw (js/Error. (str "texts-file not found: " texts-file))))
+           choice (show-texts-picker!+ texts)] 
+     (when choice
+       (paste-replaced-text-impl!+ (:text choice) provided-replacer)))))
 
 (defn select-and-paste-replaced!+
   "Selects some text, copies it and then pastes it replaced.

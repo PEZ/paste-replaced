@@ -11,10 +11,18 @@
 (defn cljify [js-thing]
   (js->clj js-thing :keywordize-keys true))
 
-(defn path-or-uri-exists?+ [path-or-uri]
-  (-> (p/let [uri (if (= (type "") (type path-or-uri)) 
+(defn- ws-uri [path-or-uri]
+  (p/let [^js uri (if (= (type "")
+                         (type path-or-uri))
                     (vscode/Uri.file path-or-uri)
-                    path-or-uri)
+                    path-or-uri)]
+    (vscode/Uri.joinPath (-> @db/!app-db
+                             :workspace-root-path
+                             :uri)
+                         (.-fsPath uri))))
+
+(defn path-or-uri-exists?+ [path-or-uri]
+  (-> (p/let [^js uri (ws-uri path-or-uri)
               _stat (vscode/workspace.fs.stat uri)])
       (p/handle
        (fn [_r, e]
@@ -23,14 +31,12 @@
            true)))))
 
 (defn vscode-read-uri+ [^js uri-or-path]
-  (let [uri (if (string? uri-or-path)
-              (vscode/Uri.file uri-or-path)
-              uri-or-path)]
+  (p/let [^js uri (ws-uri uri-or-path)]
     (-> (p/let [_ (vscode/workspace.fs.stat uri)
                 data (vscode/workspace.fs.readFile uri)
                 decoder (js/TextDecoder. "utf-8")
-                code (.decode decoder data)]
-          code))))
+                text (.decode decoder data)]
+          text))))
 
 (defn workspace-root []
   vscode/workspace.rootPath)

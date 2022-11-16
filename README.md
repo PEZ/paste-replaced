@@ -4,15 +4,15 @@ Wield regular expressions on your Clipboard
 
 ![Paste Replaced Icon](assets/paste-replaced-icon-128x128.png)
 
-Paste Clipboard or selections with configurable edits/replacements. And simulate typing, if you want. Works in editor documents as well as in all VS Code input boxes.
+Paste Clipboard, selections, or canned texts, with configurable edits/replacements. Simulate typing, if you want. Works in editor documents as well as in all VS Code input boxes.
 
 [Paste Replace on the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.paste-replaced)
 
 ## Some use cases
 
 * Automatically quote strings and newlines when pasting into strings (e.g. JSON).
-* Copy package/namespace strings and paste as paths in the 
-* Spiff up your presentations by quickly inserting canned text anywhere in VS Code.
+* Copy package/namespace strings and paste as paths in the file picker
+* Spiff up your presentations by quickly inserting canned text anywhere in VS Code, simulating typing (if you like).
 
 ## Demo Video
 
@@ -35,6 +35,8 @@ See the examples below for how this was configured.
    * Default keyboard shortcut: <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd>, <kbd>SPACE</kbd>
    * Works in documents as well as in all VS Code input boxes
 * Paste the selection replaced (overwriting it) 
+* Paste a specific piece of text configured from a keyboard shortcut
+* Configure a list oc canned texts and paste any of them from a menu. (The last selection will be remembered, so you can easily paste the next, text, and then the next, and so on.)
 * Configure typing simulation globally: instant (no simulation), fast, intermediate or slow
 * Override global typing simulation with simulation configured per **replacer**
 * Skip pasting to just place the replaced text on the clipboard

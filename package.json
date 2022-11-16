@@ -31,6 +31,8 @@
   ],
   "activationEvents": [
     "onCommand:paste-replaced.paste",
+    "onCommand:paste-replaced.pasteFromTexts",
+    "onCommand:paste-replaced.pasteText",
     "onCommand:paste-replaced.pasteSelectionReplaced"
   ],
   "main": "extension.js",
@@ -40,6 +42,16 @@
         "command": "paste-replaced.paste",
         "category": "Paste Replaced",
         "title": "Paste..."
+      },
+      {
+        "command": "paste-replaced.pasteFromTexts",
+        "category": "Paste Replaced",
+        "title": "Paste from Texts..."
+      },
+      {
+        "command": "paste-replaced.pasteText",
+        "category": "Paste Replaced",
+        "title": "Paste Text"
       },
       {
         "command": "paste-replaced.pasteSelectionReplaced",
@@ -62,6 +74,16 @@
         "command": "paste-replaced.interruptTyping",
         "key": "ctrl+alt+v escape",
         "when": "paste-replaced.isTyping"
+      },
+      {
+        "command": "paste-replaced.pasteFromTexts",
+        "key": "ctrl+alt+v t",
+        "args": null
+      },
+      {
+        "command": "paste-replaced.pasteSelectionReplaced",
+        "key": "ctrl+alt+v s",
+        "args": null
       }
     ],
     "configuration": [
@@ -143,6 +165,11 @@
             "type": "boolean",
             "markdownDescription": "Should we skip pasting the resulting text? It will only be copied to the clipboard.",
             "default": false
+          },
+          "paste-replaced.texts-file": {
+            "type": "string",
+            "markdownDescription": "The path to an EDN file that contains a vector (array) of text-items to be pasted from (replaced or verbartim). Each text-item is a map with the entries `:name` and `:text`. The `:name` will be used in the menu that is shown when you invoke the command **Paste Replaced From Texts...**.",
+            "default": "paste-replaced-texts.edn"
           }
         }
       }
