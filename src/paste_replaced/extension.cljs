@@ -32,7 +32,7 @@
     (utils/sayln "Paste Replace activating..."))
   (try (let [{:keys [extension-context]} @db/!app-db]
         (register-command! extension-context "paste-replaced.paste" #'replacer/paste-replaced!+)
-        (register-command! extension-context "paste-replaced.pasteFromTexts" #'replacer/paste-replaced-from-texts!+)
+        (register-command! extension-context "paste-replaced.pasteCanned" #'replacer/paste-replaced-canned!+)
         (register-command! extension-context "paste-replaced.pasteText" #'replacer/paste-replaced-text!+)
         (register-command! extension-context "paste-replaced.pasteSelectionReplaced" #'replacer/select-and-paste-replaced!+)
         (register-command! extension-context "paste-replaced.interruptTyping" #'replacer/interrupt-typing!)

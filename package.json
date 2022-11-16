@@ -31,7 +31,7 @@
   ],
   "activationEvents": [
     "onCommand:paste-replaced.paste",
-    "onCommand:paste-replaced.pasteFromTexts",
+    "onCommand:paste-replaced.pasteCanned",
     "onCommand:paste-replaced.pasteText",
     "onCommand:paste-replaced.pasteSelectionReplaced"
   ],
@@ -44,7 +44,7 @@
         "title": "Paste..."
       },
       {
-        "command": "paste-replaced.pasteFromTexts",
+        "command": "paste-replaced.pasteCanned",
         "category": "Paste Replaced",
         "title": "Paste from Texts..."
       },
@@ -76,7 +76,7 @@
         "when": "paste-replaced.isTyping"
       },
       {
-        "command": "paste-replaced.pasteFromTexts",
+        "command": "paste-replaced.pasteCanned",
         "key": "ctrl+alt+v t",
         "args": null
       },

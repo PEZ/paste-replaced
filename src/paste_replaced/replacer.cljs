@@ -231,11 +231,23 @@
        (throw (js/Error. (str "Paste Replaced failed: "
                               error)))))))
 
-(defn- single-quote-second
+(defn- single-quoted-second
   [x]
-  (if (symbol? (second x))
-    (symbol (str \' (second x)))
-    (str \' (second x))))
+  (let [sx (second x)
+        quoted-sx-str (str \' sx)]
+    (if (symbol? sx)
+      (symbol quoted-sx-str)
+      quoted-sx-str)))
+
+(comment
+  (->> "'(defn foo [s]\n (println \"Foo\" s 'bar))"
+       tr/read-string
+       (walk/postwalk
+        (fn [node]
+          (cond-> node
+            (and (seq? node)
+                 (= 'quote (first node))) single-quoted-second))))
+  :rcf)
 
 (defn- str-text [text-item]
   (if (= (type "")
@@ -247,7 +259,7 @@
                           (fn [node]
                             (cond-> node
                               (and (seq? node)
-                                   (= 'quote (first node))) single-quote-second))
+                                   (= 'quote (first node))) single-quoted-second))
                           text))))))
 
 (defn- paste-replaced-text-impl!+
@@ -279,18 +291,18 @@
          (apply paste-replaced-text-impl!+ (update clj-args 0 str))
          (show-readme-message+ "`args` to paste-replaced.pasteText needs to be a string or a tuple `[text, replacer]`."))))))
 
-(defn paste-replaced-from-texts!+
+(defn paste-replaced-canned!+
   "Presents a menu from the text items in the EDN file `texts-file`.
    Pastes the selected text using `provided-replacer`.
    `texts-file` defaults to `<workspace-root>/paste-replaced-texts.edn`
    `provided-replacer` defaults to no replacements.
    Providing a `nil` replacer will show a replacers menu."
   ([]
-   (paste-replaced-from-texts!+ #js {:replacements #js []}))
+   (paste-replaced-canned!+ #js {:replacements #js []}))
   ([provided-replacer]
    (p/let [config-file (-> (vscode/workspace.getConfiguration "paste-replaced")
                            (.get "texts-file"))]
-     (paste-replaced-from-texts!+ provided-replacer config-file)))
+     (paste-replaced-canned!+ provided-replacer config-file)))
   ([provided-replacer texts-file]
    (p/let [file-exists? (if texts-file
                           (utils/path-or-uri-exists?+ texts-file)
