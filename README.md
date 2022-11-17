@@ -74,11 +74,35 @@ newText = text.replace(new RegExp(search, flags), replace_with)
 
 A keyboard shortcut replacer (args to `paste-replaced.paste`) can also be a string. In this case it will be referring to replacer configured in settings. See examples below.
 
-## A Paste Clipboard Replaced Example
+## Paste Clipboard Replaced Examples
+
+### Paste in terminal without executing
+
+Here's a keybinding that strips the newline from the end of the string. Even if you copy the newline, it won't be included when pasted in the terminal, preventing it from being executed.
+
+```json
+    {
+        "command": "paste-replaced.paste",
+        "key": "ctrl+alt+v t",
+        "args": [["\n$", ""]],
+    },
+```
+
+If you have multiple commands on several lines, the bash shell will not let you paste them all without starting to execute. Here's a keybinding definition that will wrap the command lines in parens, which creates a subshell and waits for you to execute the whole batch:
+
+```json
+    {
+        "command": "paste-replaced.paste",
+        "key": "ctrl+alt+v t",
+        "args": [["\n$", ""], [".*", "(\n$&\n)", "s"]],
+    },
+```
+
+### JSON code snippets
 
 Say you need to configure code snippets in JSON. Just pasting the code leaves you with the task of quoting double quotes, potentially trimming strings of whitespace, and removing new lines.
 
-### Via keybindings
+#### Via keybindings
 
 Here's a keyboard shortcut configuration that will do all that:
 
@@ -114,7 +138,7 @@ Then place the cursor in an empty string (`""`), and do <kbd>Ctrl</kbd>+<kbd>Alt
 
 Which is much more JSON friendly. (You might want to leave strings of spaces, then skip the `[ " +", " ", "g" ]` replacer.)
 
-### Via `settings.json`
+#### Via `settings.json`
 
 You can also configure the replacer as a `paste-replaced.replacers` configuration:
 
@@ -134,7 +158,7 @@ You can also configure the replacer as a `paste-replaced.replacers` configuratio
 
 That will give you the **Paste Replaced: Paste...** menu option *Quote strings and newlines*.
 
-### Both settings and keybinding
+#### Both settings and keybinding
 
 You can make shortcuts referencing replacers configured in settings.json, to keep things a bit DRY:
 
@@ -155,7 +179,7 @@ There are basically two facilities for canned text:
 * A command **Paste Replaced: Paste From Canned...**
 * A command **Paste Replaced: Paste Text...**
 
-**Paste Canned** will bring up a menu of your configured canned texts. You configure the canned text in a (kind of) [EDN](https://learnxinyminutes.com/docs/edn/) (a bit like a much, much better JSON) file. The default location for this file is at the workspace root, named `paste-replaced-canned.edn` (configurable from settings). The format is that this file should consist of a vector (like a JS array) of maps (like a JS object), where each map has two entries:
+**Paste Canned** will bring up a menu of your configured canned texts. You configure the canned text in a (kind of) [EDN](https://learnxinyminutes.com/docs/edn/) (a bit like a much, much better JSON) file. The default location for this file is at the workspace root, named `paste-replaced-canned-texts.edn` (configurable from settings). The format is that this file should consist of a vector (like a JS array) of maps (like a JS object), where each map has two entries:
 
 * `:name`, a string with the name to show in the canned texts menu
 * `:text`, a string with the canned text, or a piece of Clojure code or EDN (this is what makes it a kind of an EDN file, because EDN can't host all Clojure code)
