@@ -160,10 +160,10 @@
             "markdownDescription": "Should we skip pasting the resulting text? It will only be copied to the clipboard.",
             "default": false
           },
-          "paste-replaced.texts-file": {
+          "paste-replaced.canned-texts-file": {
             "type": "string",
             "markdownDescription": "The path to an EDN file that contains a vector (array) of text-items to be pasted from (replaced or verbartim). Each text-item is a map with the entries `:name` and `:text`. The `:name` will be used in the menu that is shown when you invoke the command **Paste Replaced From Texts...**.",
-            "default": "paste-replaced-texts.edn"
+            "default": "paste-replaced-canned-texts.edn"
           }
         }
       }

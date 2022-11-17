@@ -7,7 +7,7 @@
             [paste-replaced.when-contexts :as when-contexts]
             [promesa.core :as p]
             [cljs.tools.reader :as tr]
-            [clojure.walk :as walk]))
+            [cljs.pprint :as pprint]))
 
 (defn gaussian-rand'
   []
@@ -238,26 +238,17 @@
        (throw (js/Error. (str "Paste Replaced failed: "
                               error)))))))
 
-(defn- single-quoted-second
+(defn- pretty-str
   [x]
-  (let [sx (second x)
-        quoted-sx-str (str \' sx)]
-    (if (symbol? sx)
-      (symbol quoted-sx-str)
-      quoted-sx-str)))
+  (binding [pprint/*print-right-margin* 120]
+    (with-out-str (pprint/pprint x))))
 
 (defn- str-text [text-item]
+  (def text-item text-item)
   (if (= (type "")
          (type (:text text-item)))
     text-item
-    (update text-item
-            :text (fn [text]
-                    (str (walk/postwalk
-                          (fn [node]
-                            (cond-> node
-                              (and (seq? node)
-                                   (= 'quote (first node))) single-quoted-second))
-                          text))))))
+    (update text-item :text pretty-str)))
 
 (defn- paste-replaced-text-impl!+
   ([text]
@@ -297,12 +288,12 @@
    (paste-replaced-canned!+ nil))
   ([provided-replacer]
    (p/let [config-file (-> (vscode/workspace.getConfiguration "paste-replaced")
-                           (.get "texts-file"))]
+                           (.get "canned-texts-file"))]
      (paste-replaced-canned!+ provided-replacer config-file)))
   ([provided-replacer texts-file]
    (p/let [file-exists? (if texts-file
                           (utils/path-or-uri-exists?+ texts-file)
-                          (throw (js/Error. "No texts-file provided")))
+                          (throw (js/Error. "No canned texts file provided")))
            texts (if file-exists?
                    (p/-> texts-file
                          (utils/vscode-read-uri+)
@@ -311,7 +302,7 @@
                           (mapv str-text))
                          (p/catch (fn [e]
                                     (throw (js/Error "Error reading texts file" e)))))
-                   (show-readme-message+ (str "texts-file not found: " texts-file)))
+                   (show-readme-message+ (str "Canned texts file not found: " texts-file)))
            choice (when texts 
                     (show-texts-picker!+ texts))] 
      (when choice
