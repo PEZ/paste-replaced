@@ -98,6 +98,25 @@ If you have multiple commands on several lines, the bash shell will not let you 
     },
 ```
 
+So, now if you have this on the clipboard:
+
+```sh
+echo foo
+echo bar
+
+```
+
+And press <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>v</kbd> <kbd>t</kbd> at the bash prompt in the terminal, you will get:
+
+```sh
+Pappas-data:test-data pez$ (
+> echo foo
+> echo bar
+> )▯
+```
+
+And can execute this at will. Of course, it's a subshell, so won't always be what you need. (E.g. if you `cd` and want that to happen in your ”calling” shell).
+
 ### JSON code snippets
 
 Say you need to configure code snippets in JSON. Just pasting the code leaves you with the task of quoting double quotes, potentially trimming strings of whitespace, and removing new lines.
