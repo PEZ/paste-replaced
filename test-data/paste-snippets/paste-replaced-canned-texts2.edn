@@ -1,0 +1,20 @@
+[{:name "Foo"
+  :text "qwerty"}
+ {:name "Bar"
+  :text "\"asdf"}
+ {:name "Baz"
+  :text "zxcvb "}
+ {:name "Quoted Clojure code"
+  :text '(defn foo [s]
+           (println "Foo" s))}
+ {:text ""}
+ {:name "Clojure code"
+  :text (defn foo [s]
+          (println "Foo" s))}
+ {:name "Stringified quoted Code"
+  :text "'(defn foo [s]\n (println \"Foo\" s))"}
+ {:name "Stringified text item"
+  :text "{:name \"Clojure code\"\n :text '(defn foo [s]\n (println \"Foo\" s))}"}
+ {:name "Clojure code with quoted symbol"
+  :text (defn foo [s]
+          (println "Foo" 's))}]

@@ -1,0 +1,11 @@
+[{:name "Plain text"
+  :text "This is a canned text.
+It has several lines,
+and a \"quoted\" word."}
+ {:name "Joyride: Hello World"
+  :text (vscode/window.showInformationMessage "Hello World!")}
+ {:name "Joyride: Are you a Joyrider?"
+  :text (p/let [choice (vscode/window.showInformationMessage "Be a Joyrider 🎸" "Yes" "Of course!")]
+          (if choice
+            (.appendLine (joyride/output-channel) (str "You choose: " choice " 🎉"))
+            (.appendLine (joyride/output-channel) "You just closed it? 😭")))}]
