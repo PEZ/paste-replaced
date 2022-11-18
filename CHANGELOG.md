@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [1.1.11] - 2022-11-18
+
 - Add command **Paste Replaced: Paste From Canned...**
 - Add command **Paste Replaced: Paste Text...**
 - Add some more error handling
