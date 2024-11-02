@@ -17,9 +17,10 @@ node_modules
 
 # Calva
 .cache
-/.portal/vs-code.edn
-.calva/output-window/
+**/.calva/output-window/output.calva-repl
 
 # Extension
 /out/
-.portal
+
+# Portal
+**/.portal/vs-code.edn
