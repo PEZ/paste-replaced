@@ -1,7 +1,7 @@
 {
   "name": "paste-replaced",
   "displayName": "Paste Replaced",
-  "description": "Paste text replaced using regular expressions that you configure, optionally simulating that you are typing it. Works anywhere in VS Code, not just the editors. E.g. ood for fast typing canned text in your presentations and a lot of other cases.",
+  "description": "Paste text replaced using regular expressions that you configure, optionally simulating that you are typing it. Works anywhere in VS Code, not just the editors. E.g. good for fast typing canned text in your presentations and a lot of other cases.",
   "version": "1.1.12",
   "publisher": "betterthantomorrow",
   "author": {
@@ -29,12 +29,7 @@
     "Replace",
     "Substitute"
   ],
-  "activationEvents": [
-    "onCommand:paste-replaced.paste",
-    "onCommand:paste-replaced.pasteCanned",
-    "onCommand:paste-replaced.pasteText",
-    "onCommand:paste-replaced.pasteSelectionReplaced"
-  ],
+  "activationEvents": [],
   "main": "extension.js",
   "contributes": {
     "commands": [
@@ -179,12 +174,12 @@
     "vscode:prepublish": "npm run clean && npm run release"
   },
   "dependencies": {
-    "@vscode/codicons": "^0.0.30",
-    "open": "^8.4.0"
+    "@vscode/codicons": "^0.0.36",
+    "open": "^10.1.0"
   },
   "devDependencies": {
-    "rimraf": "^3.0.2",
-    "shadow-cljs": "^2.18.0",
-    "vsce": "^2.7.0"
+    "rimraf": "^6.0.1",
+    "shadow-cljs": "^2.28.18",
+    "vsce": "^2.15.0"
   }
 }
