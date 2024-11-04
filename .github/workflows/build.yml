@@ -1,0 +1,67 @@
+name: Test and Build VSIX
+on:
+  push:
+    tags-ignore:
+      - 'v*'
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - 'master'
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/release'
+    steps:
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          cli: latest
+          bb: latest
+
+      - name: Cache clojure/java dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          key: ${{ runner.os }}-clojure-${{ hashFiles('**/*.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clojure-
+
+      - name: Install node dependencies
+        run: npm install
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Build VSIX
+        run: |
+          set -x
+          npm run package
+
+      - name: Get VSIX File Name
+        id: get-vsix-name
+        run: echo "VSIX_NAME=$(ls *.vsix)" >> $GITHUB_ENV
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.VSIX_NAME }}
+          path: ${{ env.VSIX_NAME }}

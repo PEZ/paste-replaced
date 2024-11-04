@@ -1,6 +1,5 @@
 (ns paste-replaced.replacer
   (:require ["vscode" :as vscode]
-            ["open" :as open]
             [paste-replaced.db :as db]
             [paste-replaced.quick-pick :as qp]
             [paste-replaced.utils :as utils :refer [cljify jsify]]
@@ -80,10 +79,10 @@
 
 (defn- compile-regex
   [r]
-  (if (and 
+  (if (and
        (vector? r)
        (<= 2 (count r))
-       (every? string? r)) 
+       (every? string? r))
     [(js/RegExp. (r 0) (get r 2 "")) (r 1)]
     (throw (js/Error. "Replacers regex should be a tuple of strings: [`search`, `replace`, `flags?`]"))))
 
@@ -170,7 +169,7 @@
       (.then
        (fn [button]
          (when button
-           (open "https://github.com/PEZ/paste-replaced#paste-replaced"))))))
+           (println "https://github.com/PEZ/paste-replaced#paste-replaced"))))))
 
 (defn- named-from-picker!+ [all-replacers]
   (p/let [named-replacers (filter #(and (map? %)
@@ -303,8 +302,8 @@
                          (p/catch (fn [e]
                                     (throw (js/Error "Error reading texts file" e)))))
                    (show-readme-message+ (str "Canned texts file not found: " texts-file)))
-           choice (when texts 
-                    (show-texts-picker!+ texts))] 
+           choice (when texts
+                    (show-texts-picker!+ texts))]
      (when choice
        (paste-replaced-text-impl!+ (:text choice) provided-replacer)))))
 

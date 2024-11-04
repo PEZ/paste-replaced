@@ -1,1 +1,10 @@
-{:tasks {dev (shell "npx shadow-cljs watch extension")}}
+{:paths ["scripts"]
+ :tasks
+ {:requires ([tasks :as t])
+
+  publish {:doc "Publish the extension"
+           :task t/publish!}
+
+  release-notes {:doc "Get release notes for <version>"
+                 :task t/print-release-notes!}
+  }}

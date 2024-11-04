@@ -1,0 +1,86 @@
+name: Release VSIX
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  release:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download VSIX Artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+          pattern: '*.vsix'
+          merge-multiple: true
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          cli: latest
+          bb: latest
+
+      - name: Cache clojure/java dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.deps.clj
+          key: ${{ runner.os }}-clojure-${{ hashFiles('**/*.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clojure-
+
+      - name: Write release notes
+        run: |
+          bb release-notes ${{ github.ref_name }} > /tmp/release-notes.md
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          bodyFile: /tmp/release-notes.md
+          artifacts: "/tmp/*.vsix"
+
+  publish-to-marketplace:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download VSIX Artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+          pattern: '*.vsix'
+          merge-multiple: true
+
+      - name: Publish to VS Code Marketplace
+        run: npx vsce publish --packagePath /tmp/*.vsix -p ${{ secrets.VSIX_TOKEN }}
+
+  publish-to-open-vsx:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download VSIX Artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+          pattern: '*.vsix'
+          merge-multiple: true
+
+      - name: Publish to Open VSX
+        run: npx ovsx publish /tmp/*.vsix --pat ${{ secrets.OPEN_VSX_TOKEN }}

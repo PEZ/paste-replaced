@@ -170,16 +170,15 @@
     "prewatch": "npm run clean",
     "compile": "npx shadow-cljs compile :extension",
     "release": "npx shadow-cljs release :extension",
-    "package": "npx vsce package --allow-star-activation",
+    "package": "npx vsce package --allow-star-activation --githubBranch master",
     "vscode:prepublish": "npm run clean && npm run release"
   },
   "dependencies": {
-    "@vscode/codicons": "^0.0.36",
-    "open": "^10.1.0"
+    "@vscode/codicons": "^0.0.36"
   },
   "devDependencies": {
     "rimraf": "^6.0.1",
     "shadow-cljs": "^2.28.18",
-    "vsce": "^2.15.0"
+    "@vscode/vsce": "^2.15.0"
   }
 }

@@ -4,41 +4,41 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
-## [1.1.11] - 2022-11-18
+## [v1.1.11] - 2022-11-18
 
 - Add command **Paste Replaced: Paste From Canned...**
 - Add command **Paste Replaced: Paste Text...**
 - Add some more error handling
 
-## [1.1.10] - 2022-11-15
+## [v1.1.10] - 2022-11-15
 
 - [Fix the extension not working on non-Macs](https://github.com/PEZ/paste-replaced/issues/4), thanks @KcZer0 and @AndrewRocky! 🙏
 
-## [1.1.9] - 2022-11-14
+## [v1.1.9] - 2022-11-14
 
 Internal stuff:
 
 - Catch any activation errors.
 - Avoid deprecated API Call.
 
-## [1.1.8] - 2022-11-12
+## [v1.1.8] - 2022-11-12
 
 - Fix bug with command **Copy Selected Text and Paste** not working in most cases
 
-## [1.1.7] - 2022-11-12
+## [v1.1.7] - 2022-11-12
 
 - Actually fix bug with backward compatability with old config format 🤦
 
-## [1.1.6] - 2022-11-12
+## [v1.1.6] - 2022-11-12
 
 - Fix bug with backward compatability with old config format
 
-## [1.1.5] - 2022-10-25
+## [v1.1.5] - 2022-10-25
 
 - Fix bug with referencing named replacers
 - Add OPEN README message when opening menu with no valid replacers are configured
 
-## [1.1.4] - 2022-10-25
+## [v1.1.4] - 2022-10-25
 
 - Changed default paste-replaced keyboard shortcut to `ctrl+alt+v space`
 - Add Paste Replace... menu
@@ -49,7 +49,7 @@ Internal stuff:
 - Keyboard shortcuts can now provide **replacers**, and select command ids (and `simulateTypingSpeed`, and `skipPaste`)
 - Add `string` type `replacements` for pasting/typing verbatim
 
-## [1.1.3] - 2022-05-31
+## [v1.1.3] - 2022-05-31
 
 - Add some logging when Paste Replaced starts and finsishes activating
 
