@@ -25,7 +25,6 @@
   (util/sh dry-run? "git" "config" "--global" "user.name" user-name)
   (util/sh dry-run? "npm" "set" "git-tag-version" "false")
   (util/sh dry-run? "npm" "version" "patch")
-  (util/sh dry-run? "git" "pull")
   (util/sh dry-run? "git" "add" ".")
   (let [version (-> (util/sh false "node" "-p" "require('./package').version")
                     :out
