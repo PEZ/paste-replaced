@@ -23,7 +23,6 @@
   (println "Bumping version")
   (util/sh dry-run? "git" "config" "--global" "user.email" user-email)
   (util/sh dry-run? "git" "config" "--global" "user.name" user-name)
-  (util/sh dry-run? "git" "checkout" "dev")
   (util/sh dry-run? "npm" "set" "git-tag-version" "false")
   (util/sh dry-run? "npm" "version" "patch")
   (util/sh dry-run? "git" "pull")
