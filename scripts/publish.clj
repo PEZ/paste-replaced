@@ -44,7 +44,10 @@
 
 (defn tag [version dry-run?]
   (println "Tagging with version" version)
-  util/throw-if-error)
+  (util/sh dry-run?
+           "git" "tag"
+           "-a" (str "v" version)
+           "-m" (str "Version " version)))
 
 (defn push [dry-run?]
   (println "Pushing")
