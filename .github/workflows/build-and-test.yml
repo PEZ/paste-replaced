@@ -103,7 +103,9 @@ jobs:
           clj-kondo: latest
 
       - name: Linting that sparks joy
-        run: clj-kondo --lint src test --fail-level warning
+        run: |
+          clj-kondo --version
+          clj-kondo --lint src test --fail-level warning
 
   check-format:
     runs-on: ubuntu-latest
@@ -118,4 +120,6 @@ jobs:
           cljfmt: latest
 
       - name: Check formatting
-        run: cljfmt check
+        run: |
+          cljfmt --version
+          cljfmt check
