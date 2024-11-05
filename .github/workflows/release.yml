@@ -8,16 +8,10 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/build-and-test.yml
-  lint:
-    uses: ./.github/workflows/build-and-test.yml
-  check-format:
-    uses: ./.github/workflows/build-and-test.yml
 
   github-release:
     needs:
       - test
-      - lint
-      - check-format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
