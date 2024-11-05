@@ -12,4 +12,7 @@
   (if dry-run?
     (do (println "Dry run:" (apply pr-str args))
         {:exit 0})
-    (apply p/sh args)))
+    (do
+      (apply println args)
+      (throw-if-error
+       (apply p/sh args)))))

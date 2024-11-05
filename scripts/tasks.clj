@@ -20,6 +20,7 @@
 ; git push origin HEAD
 
 (defn -bump-version! [user-email user-name dry-run?]
+  (println "Bumping version")
   (util/sh dry-run? "git" "config" "--global" "user.email" user-email)
   (util/sh dry-run? "git" "config" "--global" "user.name" user-name)
   (util/sh dry-run? "git" "checkout" "dev")

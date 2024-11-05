@@ -37,25 +37,22 @@
 (defn commit-changelog [file-name message dry-run?]
   (println "Committing")
   (util/sh dry-run? "git" "add" file-name)
-  (util/throw-if-error (util/sh dry-run?
-                                "git" "commit"
-                                "-m" message
-                                "-o" file-name)))
+  (util/sh dry-run?
+           "git" "commit"
+           "-m" message
+           "-o" file-name))
 
 (defn tag [version dry-run?]
   (println "Tagging with version" version)
-  (util/throw-if-error (util/sh dry-run?
-                                "git" "tag"
-                                "-a" (str "v" version)
-                                "-m" (str "Version " version))))
+  util/throw-if-error)
 
 (defn push [dry-run?]
   (println "Pushing")
-  (util/throw-if-error (util/sh dry-run? "git" "push" "--follow-tags")))
+  (util/sh dry-run? "git" "push" "--follow-tags"))
 
 (defn git-status []
   (println "Checking git status")
-  (let [result (util/throw-if-error (util/sh false "git" "status"))
+  (let [result (util/sh false "git" "status")
         out (:out result)
         [_ branch] (re-find #"^On branch (\S+)\n" out)
         up-to-date (re-find #"Your branch is up to date" out)
