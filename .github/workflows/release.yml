@@ -120,3 +120,18 @@ jobs:
         run: |
           npx ovsx verify-pat betterthantomorrow --pat ${{ secrets.OPEN_VSX_TOKEN }}
           echo npx ovsx publish /tmp/*.vsix --pat ${{ secrets.OPEN_VSX_TOKEN }}
+
+  bump-version:
+    runs-on: ubuntu-latest
+    needs: publish-to-marketplace
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Babashka
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          bb: latest
+
+      - name: Bump Version
+        run: bb bump-version "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}" -d

@@ -1,15 +1,9 @@
 (ns publish
   (:require [clojure.string :as string]
             [cheshire.core :as json]
-            [babashka.process :as p]))
+            util))
 
 (def changelog-filename "CHANGELOG.md")
-
-(defn sh [dry-run? & args]
-  (if dry-run?
-    (do (println "Dry run:" (apply pr-str args))
-        {:exit 0})
-    (apply p/sh args)))
 
 (defn release-pattern [version]
   (re-pattern (str "## \\[" (string/replace version "." "\\.") "\\].*")))
@@ -40,35 +34,28 @@
                   (format "## [Unreleased]\n\n%s" new-header))]
     new-text))
 
-(defn throw-if-error [{:keys [exit out err] :as result}]
-  (if-not (= exit 0)
-    (throw (Exception. (if (empty? out)
-                         err
-                         out)))
-    result))
-
 (defn commit-changelog [file-name message dry-run?]
   (println "Committing")
-  (sh dry-run? "git" "add" file-name)
-  (throw-if-error (sh dry-run?
-                      "git" "commit"
-                      "-m" message
-                      "-o" file-name)))
+  (util/sh dry-run? "git" "add" file-name)
+  (util/throw-if-error (util/sh dry-run?
+                                "git" "commit"
+                                "-m" message
+                                "-o" file-name)))
 
 (defn tag [version dry-run?]
   (println "Tagging with version" version)
-  (throw-if-error (sh dry-run?
-                      "git" "tag"
-                      "-a" (str "v" version)
-                      "-m" (str "Version " version))))
+  (util/throw-if-error (util/sh dry-run?
+                                "git" "tag"
+                                "-a" (str "v" version)
+                                "-m" (str "Version " version))))
 
 (defn push [dry-run?]
   (println "Pushing")
-  (throw-if-error (sh dry-run? "git" "push" "--follow-tags")))
+  (util/throw-if-error (util/sh dry-run? "git" "push" "--follow-tags")))
 
 (defn git-status []
   (println "Checking git status")
-  (let [result (throw-if-error (p/sh "git" "status"))
+  (let [result (util/throw-if-error (util/sh false "git" "status"))
         out (:out result)
         [_ branch] (re-find #"^On branch (\S+)\n" out)
         up-to-date (re-find #"Your branch is up to date" out)

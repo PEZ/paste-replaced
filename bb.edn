@@ -7,4 +7,6 @@
 
   release-notes {:doc "Get release notes for <version>"
                  :task t/print-release-notes!}
-  }}
+
+  bump-version {:doc "Bump the extension version"
+                :task t/bump-version!}}}
