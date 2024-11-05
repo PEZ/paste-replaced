@@ -49,7 +49,6 @@
   (when-contexts/set-context!+ ::when-contexts/paste-replaced.isActive false)
   (clear-disposables!))
 
-
 (defn before [done]
   (js/console.log "shadow-cljs before reloading paste-replaced")
   (-> (clear-disposables!)
