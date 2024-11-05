@@ -6,7 +6,11 @@ on:
       - 'v*'
 
 jobs:
-  checks:
+  test:
+    uses: ./.github/workflows/build-and-test.yml
+  lint:
+    uses: ./.github/workflows/build-and-test.yml
+  check-format:
     uses: ./.github/workflows/build-and-test.yml
 
   github-release:
