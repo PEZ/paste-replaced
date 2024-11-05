@@ -4,6 +4,10 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [v1.1.12] - 2024-11-05
+
+- 3 Test release workflow
+
 ## [v1.1.11] - 2022-11-18
 
 - Add command **Paste Replaced: Paste From Canned...**
