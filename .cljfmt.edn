@@ -1,0 +1,3 @@
+; Needed to guarantee that we use cljfmt defaults
+; (Without this file cljfmt may find a config file in a parent directory.)
+{}
