@@ -8,7 +8,7 @@
   publish {:doc "Usage: bb publish [-d]"
            :task t/publish!}
 
-  package-pre-release {:doc "Usage: bb package-pre-release [-d]"
+  package-pre-release {:doc "Usage: bb package-pre-release <branch> [-d]"
                        :task t/package-pre-release!}
 
   ci:release-notes {:doc "Get release notes for <version>"
