@@ -10,15 +10,6 @@
   (let [changelog-text (publish/get-changelog-text-for-version version)]
     (println changelog-text)))
 
-; git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
-; git config --global user.name "$GITHUB_ACTOR"
-; git checkout dev
-; npm set git-tag-version false && npm version patch
-; git pull
-; git add .
-; git commit -m "Bring on version $(node -p "require('./package').version")!"
-; git push origin HEAD
-
 (defn -bump-version! [user-email user-name dry-run?]
   (println "Bumping version")
   (util/sh dry-run? "git" "config" "--global" "user.email" user-email)
