@@ -14,5 +14,15 @@
         {:exit 0})
     (do
       (apply println args)
+      (flush)
       (throw-if-error
        (apply p/sh args)))))
+
+(defn random-slug [n]
+  (let [chars "abcdefghijklmnopqrstuvwxyz"]
+    (apply str (repeatedly n #(rand-nth chars)))))
+
+(comment
+  (random-slug 2)
+  :rcf)
+

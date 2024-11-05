@@ -2,13 +2,17 @@
  :tasks
  {:requires ([tasks :as t])
 
-  ;; Use the -d arg to make the task a dry-run.
+  ;; Tasks that take a -d arg support a dry-run.
+  ;; -d needs to go last of any other args.
+
   publish {:doc "Usage: bb publish [-d]"
            :task t/publish!}
+
+  package-pre-release {:doc "Usage: bb package-pre-release [-d]"
+                       :task t/package-pre-release!}
 
   ci:release-notes {:doc "Get release notes for <version>"
                     :task t/print-release-notes!}
 
-  ;; The -d arg needs to go last. It will make the task a dry-run.
   ci:bump-version {:doc "Usage: bb bump-version <email> <user-name> [-d]"
                    :task t/bump-version!}}}

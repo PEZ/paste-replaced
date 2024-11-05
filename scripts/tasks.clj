@@ -29,3 +29,23 @@
 
 (comment
   (bump-version! "pez@pezius.com" "Peter Strömberg" "-d"))
+
+(defn -package-pre-release! [dry-run?]
+  (let [current-version (-> (util/sh false "node" "-p" "require('./package').version") :out string/trim)
+        commit-id (-> (util/sh false "git" "rev-parse" "--short" "HEAD") :out string/trim)
+        random-slug (util/random-slug 2)
+        pre-id (str commit-id "-" random-slug)]
+    (println "Current version:" current-version)
+    (println "HEAD Commit ID:" commit-id)
+    (println "Packaging pre-release...")
+    (println (:out (util/sh dry-run? "npm" "version" "prerelease" "--preid" pre-id)))
+    (println (:out (util/sh dry-run? "npx" "vsce" "package" "--pre-release")))
+    (println (:out (util/sh dry-run? "npm" "version" "--no-git-tag-version" current-version)))))
+
+(defn package-pre-release! [& args]
+  (-package-pre-release! (when (first args) true)))
+
+(comment
+  (package-pre-release! "-d")
+  :rcf)
+
