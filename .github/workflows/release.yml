@@ -134,4 +134,4 @@ jobs:
           bb: latest
 
       - name: Bump Version
-        run: bb bump-version "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}" -d
+        run: bb bump-version "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}"
