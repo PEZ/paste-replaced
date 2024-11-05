@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  release-test:
     uses: ./.github/workflows/build.yml
 
   github-release:
