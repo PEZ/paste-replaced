@@ -1,4 +1,4 @@
-name: Test and Build VSIX
+name: Build and test
 on:
   push:
     tags-ignore:
@@ -61,7 +61,29 @@ jobs:
         id: get-vsix-name
         run: echo "VSIX_NAME=$(ls *.vsix)" >> $GITHUB_ENV
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload VSIX Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.VSIX_NAME }}
           path: ${{ env.VSIX_NAME }}
+
+      - name: Upload Test Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-tests
+          path: out/extension-tests.js
+
+  release-test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Test Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-tests
+          pattern: out/extension-tests.js
+          merge-multiple: true
+          path: out/
+
+      - name: Run Tests
+        run: node out/extension-tests.js
