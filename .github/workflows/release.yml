@@ -6,12 +6,12 @@ on:
       - 'v*'
 
 jobs:
-  release-test:
-    uses: ./.github/workflows/build.yml
+  test:
+    uses: ./.github/workflows/build-and-test.yml
 
   github-release:
     needs:
-      - release-test
+      - test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,7 +43,7 @@ jobs:
 
       - name: Write release notes
         run: |
-          bb release-notes ${{ github.ref_name }} > /tmp/release-notes.md
+          bb ci:release-notes ${{ github.ref_name }} > /tmp/release-notes.md
 
       - name: Github Release
         uses: ncipollo/release-action@v1
@@ -138,4 +138,4 @@ jobs:
       - name: Bump Version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bb bump-version "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}"
+        run: bb ci:bump-version "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}"
