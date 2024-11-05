@@ -166,10 +166,14 @@
   },
   "scripts": {
     "clean": "rimraf .cpcache .shadow-cljs/ out/",
-    "watch": "npx shadow-cljs -d cider/cider-nrepl:0.50.2 watch :extension",
+    "watch": "npx shadow-cljs -d cider/cider-nrepl:0.50.2 watch :extension :test-watch",
+    "test": "node out/extension-tests.js",
+    "pretest": "npm run compile",
     "prewatch": "npm run clean",
-    "compile": "npx shadow-cljs compile :extension",
-    "release": "npx shadow-cljs release :extension",
+    "compile": "npx shadow-cljs compile :extension :test-compile",
+    "precompile": "npm run clean",
+    "release-test": "node out/extension-tests.js",
+    "release": "npx shadow-cljs release :extension :test-compile",
     "package": "npx vsce package --allow-star-activation --githubBranch master",
     "vscode:prepublish": "npm run clean && npm run release"
   },

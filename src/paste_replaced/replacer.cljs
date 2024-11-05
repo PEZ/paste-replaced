@@ -1,47 +1,13 @@
 (ns paste-replaced.replacer
   (:require ["vscode" :as vscode]
             [paste-replaced.db :as db]
+            [paste-replaced.pauses :as pauses]
             [paste-replaced.quick-pick :as qp]
             [paste-replaced.utils :as utils :refer [cljify jsify]]
             [paste-replaced.when-contexts :as when-contexts]
             [promesa.core :as p]
             [cljs.tools.reader :as tr]
             [cljs.pprint :as pprint]))
-
-(defn gaussian-rand'
-  []
-  (let [accuracy 7]
-    (loop [rand 0
-           i 0]
-      (if (< i accuracy)
-        (recur (+ rand (.random js/Math)) (inc i))
-        (/ rand accuracy)))))
-
-(defn gaussian-rand
-  [start end]
-  (js/Math.floor
-   (+ start (* (gaussian-rand') (+ (- end start) 1)))))
-
-(def typing-pauses
-  {"fast" {:char 0
-           :space 0
-           :nl 350
-           :description "Typed as a really fast keyboard wielder"}
-   "intermediate" {:char 75
-                   :space 250
-                   :nl 1300
-                   :description "Typed as an intermediately fast typist"}
-   "slow" {:char 350
-           :space 1000
-           :nl 2500
-           :description "Typed as a slow, painfully slow, typist"}})
-
-(defn humanize-pause
-  [s typing-speed]
-  (cond
-    (re-find #"^ |\t$" s) (gaussian-rand 0 (-> typing-speed typing-pauses :space))
-    (re-find #"\s{2,}|\n" s) (gaussian-rand 0 (-> typing-speed typing-pauses :nl))
-    :else (gaussian-rand 0 (-> typing-speed typing-pauses :char))))
 
 (def ^:private unicode-split-re (js/RegExp. "." "us"))
 
@@ -71,7 +37,7 @@
                      (p/create
                       (fn [resolve, _reject]
                         (js/setTimeout resolve
-                                       (humanize-pause c typing-speed)))))))
+                                       (pauses/humanize-pause c typing-speed)))))))
           (if (re-find #"\s{2,}" word)
             [word]
             (re-seq unicode-split-re word)))))
@@ -243,7 +209,6 @@
     (with-out-str (pprint/pprint x))))
 
 (defn- str-text [text-item]
-  (def text-item text-item)
   (if (= (type "")
          (type (:text text-item)))
     text-item

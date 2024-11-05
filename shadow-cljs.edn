@@ -9,4 +9,14 @@
               :output-to "out/extension.js"
               :exports {:activate paste-replaced.extension/activate}
               :devtools {:before-load-async paste-replaced.extension/before
-                         :after-load paste-replaced.extension/after}}}}
+                         :after-load paste-replaced.extension/after}}
+  :test-watch
+  {:target    :node-test
+   :output-to "out/extension-tests.js"
+   :ns-regexp "-test$"
+   :autorun   true}
+
+  :test-compile
+  {:target    :node-test
+   :output-to "out/extension-tests.js"
+   :ns-regexp "-test$"}}}
