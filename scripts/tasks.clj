@@ -38,7 +38,7 @@
     (println "Current version:" current-version)
     (println "HEAD Commit ID:" commit-id)
     (println "Packaging pre-release...")
-    (println (:out (util/sh dry-run? "npm" "version" "prerelease" "--preid" pre-id)))
+    (println (:out (util/sh dry-run? "npm" "version" "--no-git-tag-version" "prerelease" "--preid" pre-id)))
     (println (:out (util/sh dry-run? "npx" "vsce" "package" "--pre-release")))
     (println (:out (util/sh dry-run? "npm" "version" "--no-git-tag-version" current-version)))))
 
