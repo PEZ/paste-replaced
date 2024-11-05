@@ -118,4 +118,4 @@ jobs:
           cljfmt: latest
 
       - name: Check formatting
-        run: clj-kondo --lint src test --fail-level warning
+        run: cljfmt check
