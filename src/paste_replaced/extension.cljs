@@ -31,18 +31,18 @@
            :typing-interrupted? false)
     (utils/sayln "Paste Replace activating..."))
   (try (let [{:keys [extension-context]} @db/!app-db]
-        (register-command! extension-context "paste-replaced.paste" #'replacer/paste-replaced!+)
-        (register-command! extension-context "paste-replaced.pasteCanned" #'replacer/paste-replaced-canned!+)
-        (register-command! extension-context "paste-replaced.pasteText" #'replacer/paste-replaced-text!+)
-        (register-command! extension-context "paste-replaced.pasteSelectionReplaced" #'replacer/select-and-paste-replaced!+)
-        (register-command! extension-context "paste-replaced.interruptTyping" #'replacer/interrupt-typing!)
-        (when-contexts/set-context!+ ::when-contexts/paste-replaced.isActive true)
-        (js/console.info "Paste Replace activate END")
-        (utils/sayln "Paste Replace activation done"))
-      (catch :default e
-        (utils/say-error (str "Paste Replace activation failed: " (.-message e) ", see Development Console for stack trace"))
-        (throw e)))
-  
+         (register-command! extension-context "paste-replaced.paste" #'replacer/paste-replaced!+)
+         (register-command! extension-context "paste-replaced.pasteCanned" #'replacer/paste-replaced-canned!+)
+         (register-command! extension-context "paste-replaced.pasteText" #'replacer/paste-replaced-text!+)
+         (register-command! extension-context "paste-replaced.pasteSelectionReplaced" #'replacer/select-and-paste-replaced!+)
+         (register-command! extension-context "paste-replaced.interruptTyping" #'replacer/interrupt-typing!)
+         (when-contexts/set-context!+ ::when-contexts/paste-replaced.isActive true)
+         (js/console.info "Paste Replace activate END")
+         (utils/sayln "Paste Replace activation done"))
+       (catch :default e
+         (utils/say-error (str "Paste Replace activation failed: " (.-message e) ", see Development Console for stack trace"))
+         (throw e)))
+
   api)
 
 (defn ^:export deactivate []
