@@ -16,15 +16,15 @@
 
 (defn get-changelog-text-for-version [version]
   (let [pattern (release-pattern version)]
-    (-> (slurp changelog-filename)
-        (string/split pattern)
-        second
-        (string/split #"##")
-        first
-        string/trim)))
+    (some-> (slurp changelog-filename)
+            (string/split pattern)
+            second
+            (string/split #"##")
+            first
+            string/trim)))
 
 (comment
-  (get-changelog-text-for-version "Unreleased")
+  (get-changelog-text-for-version "v1.1.12")
   :rcf)
 
 (defn new-changelog-text
