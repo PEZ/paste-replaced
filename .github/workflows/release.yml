@@ -134,4 +134,6 @@ jobs:
           bb: latest
 
       - name: Bump Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bb bump-version "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}"
