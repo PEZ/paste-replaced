@@ -3,7 +3,6 @@
 */**
 
 # Whitelist
-!extension.js
 !package.json
 !assets/**/[^.]*.*
 !README.md

@@ -30,7 +30,7 @@
     "Substitute"
   ],
   "activationEvents": [],
-  "main": "extension.js",
+  "main": "out/extension.js",
   "contributes": {
     "commands": [
       {
