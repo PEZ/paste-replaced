@@ -51,25 +51,15 @@
         (p/reject! running fail-reason)
         (p/resolve! running true)))))
 
-;; We rely on that the user_activate.cljs script is run before workspace_activate.cljs
-(defn- run-when-ws-activated [tries]
-  (if (:ws-activated? @db/!state)
-    (do
-      (println "Runner: Workspace activated, running tests...")
-      (try
-        (doseq [ns-sym (config/ns-symbols)]
-          (require ns-sym)
-          (cljs.test/run-tests ns-sym))
-        (catch :default e
-          (p/reject! (:running @db/!state) e))))
-    (do
-      (println "Runner: Workspace not activated yet, tries: " tries "- trying again in a jiffy")
-      (js/setTimeout #(run-when-ws-activated (inc tries)) 10))))
-
 (defn run-all-tests []
   (let [running (p/deferred)]
     (swap! db/!state assoc :running running)
-    (run-when-ws-activated 1)
+    (try
+      (doseq [ns-sym (config/ns-symbols)]
+        (require ns-sym)
+        (cljs.test/run-tests ns-sym))
+      (catch :default e
+        (p/reject! (:running @db/!state) e)))
     running))
 
 (comment
