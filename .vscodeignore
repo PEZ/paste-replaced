@@ -1,13 +1,11 @@
 # Put everything on the blacklist by default
 *
 */**
-**/.*
-*/**/.*
 
 # Whitelist
 !extension.js
 !package.json
-!assets/**
+!assets/**/[^.]*.*
 !README.md
 !CHANGELOG.md
 !LICENSE.txt
