@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+- Fix issue with humanized typing speed sometimes glitching
+
 ## [v1.1.11] - 2022-11-18
 
 - Add command **Paste Replaced: Paste From Canned...**

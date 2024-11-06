@@ -82,9 +82,7 @@ jobs:
           merge-multiple: true
 
       - name: Publish to VS Code Marketplace
-        run: |
-          npx vsce verify-pat betterthantomorrow --pat ${{ secrets.VSIX_TOKEN }}
-          echo npx vsce publish --packagePath /tmp/*.vsix --pat ${{ secrets.VSIX_TOKEN }} --githubBranch master
+        run: npx vsce publish --packagePath /tmp/*.vsix --pat ${{ secrets.VSIX_TOKEN }} --githubBranch master
 
   publish-to-open-vsx:
     runs-on: ubuntu-latest
@@ -117,9 +115,7 @@ jobs:
           merge-multiple: true
 
       - name: Publish to Open VSX
-        run: |
-          npx ovsx verify-pat betterthantomorrow --pat ${{ secrets.OPEN_VSX_TOKEN }}
-          echo npx ovsx publish /tmp/*.vsix --pat ${{ secrets.OPEN_VSX_TOKEN }}
+        run: npx ovsx publish /tmp/*.vsix --pat ${{ secrets.OPEN_VSX_TOKEN }}
 
   bump-version:
     runs-on: ubuntu-latest
