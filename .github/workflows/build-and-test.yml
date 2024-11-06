@@ -117,6 +117,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
+      - name: Install node dependencies
+        run: npm install
+
       - name: Setup Babashka
         uses: DeLaGuardo/setup-clojure@12.5
         with:
