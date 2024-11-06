@@ -24,3 +24,6 @@ node_modules
 
 # Portal
 **/.portal/vs-code.edn
+
+# vscode test-electron
+.vscode-test/

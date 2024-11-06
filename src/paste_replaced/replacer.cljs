@@ -85,7 +85,7 @@
                      replacers
                      (reduce (fn [acc [s r]]
                                (.replace acc s r))
-                             original-clipboard-text
+                             "baz" #_original-clipboard-text
                              replacers))
           simulate-typing-config (simulate-typing-config-for-replacer replacer)
           skip-paste? (skip-paste-for-replacer? replacer)]

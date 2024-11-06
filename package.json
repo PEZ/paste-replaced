@@ -184,6 +184,7 @@
     "rimraf": "^6.0.1",
     "shadow-cljs": "^2.28.18",
     "@vscode/vsce": "^3.2.1",
+    "@vscode/test-electron": "^2.4.1",
     "ovsx": "^0.10.0"
   }
 }

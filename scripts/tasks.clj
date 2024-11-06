@@ -1,5 +1,6 @@
 (ns tasks
-  (:require [clojure.string :as string]
+  (:require [babashka.process :as p]
+            [clojure.string :as string]
             publish
             util))
 
@@ -53,3 +54,10 @@
   (package-pre-release! "-d")
   :rcf)
 
+(defn run-e2e-tests-with-vsix! [vsix]
+  (println "Running end-to-end tests using vsix:" vsix)
+  (p/shell "node" "./e2e-test-ws/launch.js" (str "--vsix=" vsix)))
+
+(defn run-e2e-tests-from-working-dir! []
+  (println "Running end-to-end tests using working directory")
+  (p/shell "node" "./e2e-test-ws/launch.js"))

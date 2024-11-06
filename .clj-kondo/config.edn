@@ -1,0 +1,1 @@
+{:lint-as {macros/deftest-async clojure.test/deftest}}
