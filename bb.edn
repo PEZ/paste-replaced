@@ -29,9 +29,9 @@
                                                :args->opts [:version]}))}
 
   ci:bump-version-and-push
-  {:doc "Usage: bb bump-version <email> <user-name> [--dry]"
+  {:doc "Usage: bb bump-version <email> <user-name> [--dry] [--force]"
    :task (t/bump-version!
-          (cli/parse-opts *command-line-args* {:restrict [:email :user-name :dry]
+          (cli/parse-opts *command-line-args* {:restrict [:email :user-name :dry :force]
                                                :require [:email :user-name]
                                                :args->opts [:email :user-name]}))}
 
