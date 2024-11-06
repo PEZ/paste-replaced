@@ -41,7 +41,7 @@
     (println "Current version:" current-version)
     (println "HEAD Commit ID:" commit-id)
     (println "Packaging pre-release...")
-    (util/shell dry "npm" "version" version)
+    (util/shell dry "npm" "version" "--no-git-tag-version" version)
     (util/shell dry "npx" "vsce" "package" "--pre-release")
     (util/shell dry "npm" "version" "--no-git-tag-version" current-version)))
 
