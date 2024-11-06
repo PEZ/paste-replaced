@@ -2,7 +2,7 @@
   (:require ["vscode" :as vscode]
             [cljs.test :refer [deftest testing is]]
             [promesa.core :as p]
-            [macros :refer [deftest-async]]))
+            [test-runner.macros :refer [deftest-async]]))
 
 (deftest hello
   (testing "We can test things"

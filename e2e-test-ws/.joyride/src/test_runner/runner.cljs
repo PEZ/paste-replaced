@@ -1,9 +1,9 @@
-(ns test-runner
+(ns test-runner.runner
   (:require [clojure.string :as string]
             [cljs.test]
-            [config :as config]
-            [db :as db]
-            [promesa.core :as p]))
+            [promesa.core :as p]
+            [test-runner.config :as config]
+            [test-runner.db :as db]))
 
 (defn- write [& xs]
   (js/process.stdout.write (string/join " " xs)))
