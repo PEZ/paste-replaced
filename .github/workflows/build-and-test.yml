@@ -107,7 +107,10 @@ jobs:
           bb: latest
 
       - name: Run Tests
-        run: bb run-e2e-tests-vsix /tmp/*.vsix
+        run: |
+          ls /tmp/*.vsix
+          bb tasks
+          bb run-e2e-tests-vsix /tmp/*.vsix
 
   lint:
     runs-on: ubuntu-latest
