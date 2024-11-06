@@ -28,8 +28,7 @@
       (apply p/shell args))))
 
 (defn random-slug [n]
-  (let [chars "abcdefghijklmnopqrstuvwxyz"]
-    (apply str (repeatedly n #(rand-nth chars)))))
+  (apply str (repeatedly n #(rand-nth "abcdefghijklmnopqrstuvwxyz"))))
 
 (comment
   (random-slug 2)
