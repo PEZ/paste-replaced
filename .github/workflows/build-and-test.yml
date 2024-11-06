@@ -104,6 +104,10 @@ jobs:
           pattern: '*.vsix'
           merge-multiple: true
 
+      - name: Get VSIX File Name
+        id: get-vsix-name
+        run: echo "VSIX_NAME=$(ls /tmp/*.vsix)" >> $GITHUB_ENV
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -128,7 +132,7 @@ jobs:
       - name: Run Tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: bb run-e2e-tests-vsix $(ls /tmp/*.vsix)
+          run: bb run-e2e-tests-vsix ${{ env.VSIX_NAME }}
 
   lint:
     runs-on: ubuntu-latest
