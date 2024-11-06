@@ -134,4 +134,4 @@ jobs:
       - name: Bump Version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bb ci:bump-version "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}"
+        run: bb ci:bump-version-and-push "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com" "${{ github.actor }}"

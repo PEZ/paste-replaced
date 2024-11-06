@@ -71,7 +71,7 @@
   (println "Open to follow the progress of the release:")
   (println "  https://github.com/PEZ/paste-replaced/actions"))
 
-(defn publish [unreleased-changelog-text dry-run?]
+(defn publish! [unreleased-changelog-text dry-run?]
   (let [changelog-text (slurp changelog-filename)
         extension-version (-> (slurp "package.json")
                               json/parse-string
@@ -90,12 +90,11 @@
                           dry-run?)
         (tag-and-push! extension-version dry-run?)))))
 
-(defn run [& args]
-  (let [dry-run? (= "-d" (first args))
-        unreleased-changelog-text (get-changelog-text-for-version "Unreleased")
+(defn yolo! [{:keys [dry]}]
+  (let [unreleased-changelog-text (get-changelog-text-for-version "Unreleased")
 
         status (git-status)]
-    (println "dry-run?" dry-run?)
+    (println "dry-run?" dry)
     (if (or (seq status)
             (empty? unreleased-changelog-text))
       (do
@@ -108,13 +107,5 @@
         (let [answer (str (read))]
           (if-not (= "YES" answer)
             (println "Aborting publish.")
-            (publish unreleased-changelog-text dry-run?))))
-      (publish unreleased-changelog-text dry-run?))))
-
-(when (= *file* (System/getProperty "babashka.file"))
-  (apply run *command-line-args*))
-
-(comment
-  (run "-d")
-  :rcf)
-
+            (publish! unreleased-changelog-text dry))))
+      (publish! unreleased-changelog-text dry))))

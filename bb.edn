@@ -1,24 +1,45 @@
 {:paths ["scripts"]
+ :deps {org.babashka/cli {:mvn/version "0.2.23"}}
  :tasks
- {:requires ([tasks :as t])
+ {:requires [[babashka.cli :as cli]
+             [tasks :as t]
+             publish]
 
-  ;; Tasks that take a -d arg support a dry-run.
-  ;; -d needs to go last of any other args.
+  publish
+  {:doc "Usage: bb publish [--dry]"
+   :task (t/publish!
+          (cli/parse-opts *command-line-args* {:restrict [:dry]}))}
 
-  publish {:doc "Usage: bb publish [-d]"
-           :task t/publish!}
+  package-pre-release
+  {:doc "Usage: bb package-pre-release <branch> [--dry]"
+   :task (t/package-pre-release!
+          (cli/parse-opts *command-line-args* {:restrict [:branch :dry]
+                                               :require [:branch]
+                                               :args->opts [:branch]}))}
 
-  package-pre-release {:doc "Usage: bb package-pre-release <branch> [-d]"
-                       :task t/package-pre-release!}
+  ci:release-notes
+  {:doc "Get release notes for <version>"
+   :task (t/print-release-notes!
+          (cli/parse-opts *command-line-args* {:require [:version]
+                                               :validate {:version
+                                                          (fn [v]
+                                                            (re-matches
+                                                             (re-pattern "v\\d+\\.\\d+\\.\\d+")
+                                                             v))}
+                                               :args->opts [:version]}))}
 
-  ci:release-notes {:doc "Get release notes for <version>"
-                    :task t/print-release-notes!}
+  ci:bump-version-and-push
+  {:doc "Usage: bb bump-version <email> <user-name> [--dry]"
+   :task (t/bump-version!
+          (cli/parse-opts *command-line-args* {:restrict [:email :user-name :dry]
+                                               :require [:email :user-name]
+                                               :args->opts [:email :user-name]}))}
 
-  ci:bump-version {:doc "Usage: bb bump-version <email> <user-name> [-d]"
-                   :task t/bump-version!}
+  run-e2e-tests-ws
+  {:doc "Run end-to-end tests using working directory"
+   :task t/run-e2e-tests-from-working-dir!}
 
-  run-e2e-tests-ws {:doc "Run end-to-end tests using working directory"
-                    :task t/run-e2e-tests-from-working-dir!}
-
-  run-e2e-tests-vsix {:doc "Run end-to-end tests using <vsix>"
-                      :task t/run-e2e-tests-with-vsix!}}}
+  run-e2e-tests-vsix
+  {:doc "Run end-to-end tests using <vsix>"
+   :task (t/run-e2e-tests-with-vsix! (cli/parse-opts *command-line-args* {:require [:vsix]
+                                                                          :args->opts [:vsix]}))}}}

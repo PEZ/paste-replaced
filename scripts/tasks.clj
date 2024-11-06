@@ -2,36 +2,34 @@
   (:require [babashka.process :as p]
             [clojure.string :as string]
             publish
-            util))
+            util
+            [babashka.cli :as cli]))
 
-(defn publish! [& args]
-  (apply publish/run args))
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn publish! [args]
+  (publish/yolo! args))
 
-(defn print-release-notes! [version]
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn print-release-notes! [{:keys [version]}]
   (let [changelog-text (publish/get-changelog-text-for-version version)]
     (println changelog-text)))
 
-(defn -bump-version! [user-email user-name dry-run?]
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn bump-version! [{:keys [user-email user-name dry]}]
   (println "Bumping version")
-  (util/sh dry-run? "git" "config" "--global" "user.email" user-email)
-  (util/sh dry-run? "git" "config" "--global" "user.name" user-name)
-  (util/sh dry-run? "npm" "set" "git-tag-version" "false")
-  (util/sh dry-run? "npm" "version" "patch")
-  (util/sh dry-run? "git" "add" ".")
+  (util/sh dry "git" "config" "--global" "user.email" user-email)
+  (util/sh dry "git" "config" "--global" "user.name" user-name)
+  (util/sh dry "npm" "set" "git-tag-version" "false")
+  (util/sh dry "npm" "version" "patch")
+  (util/sh dry "git" "add" ".")
   (let [version (-> (util/sh false "node" "-p" "require('./package').version")
                     :out
                     string/trim)]
-    (util/sh dry-run? "git" "commit" "-m" (str "Bring on version " version "!")))
-  (util/sh dry-run? "git" "push" "origin" "HEAD"))
+    (util/sh dry "git" "commit" "-m" (str "Bring on version " version "!")))
+  (util/sh dry "git" "push" "origin" "HEAD"))
 
-(defn bump-version! [& args]
-  (let [[user-email user-name dry-arg] args]
-    (-bump-version! user-email user-name (when dry-arg true))))
-
-(comment
-  (bump-version! "pez@pezius.com" "Peter Strömberg" "-d"))
-
-(defn -package-pre-release! [branch dry-run?]
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn package-pre-release! [{:keys [branch dry]}]
   (let [current-version (-> (util/sh false "node" "-p" "require('./package').version")
                             :out string/trim)
         commit-id (-> (util/sh false "git" "rev-parse" "--short" "HEAD")
@@ -42,22 +40,16 @@
     (println "Current version:" current-version)
     (println "HEAD Commit ID:" commit-id)
     (println "Packaging pre-release...")
-    (println (:out (util/sh dry-run? "npm" "version" "--no-git-tag-version" "prerelease" "--preid" pre-id)))
-    (println (:out (util/sh dry-run? "npx" "vsce" "package" "--pre-release")))
-    (println (:out (util/sh dry-run? "npm" "version" "--no-git-tag-version" current-version)))))
+    (println (:out (util/sh dry "npm" "version" "--no-git-tag-version" "prerelease" "--preid" pre-id)))
+    (println (:out (util/sh dry "npx" "vsce" "package" "--pre-release")))
+    (println (:out (util/sh dry "npm" "version" "--no-git-tag-version" current-version)))))
 
-(defn package-pre-release! [& args]
-  (let [[branch dry-arg] args]
-    (-package-pre-release! branch (when dry-arg true))))
-
-(comment
-  (package-pre-release! "-d")
-  :rcf)
-
-(defn run-e2e-tests-with-vsix! [vsix]
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn run-e2e-tests-with-vsix! [{:keys [vsix]}]
   (println "Running end-to-end tests using vsix:" vsix)
   (p/shell "node" "./e2e-test-ws/launch.js" (str "--vsix=" vsix)))
 
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
 (defn run-e2e-tests-from-working-dir! []
   (println "Running end-to-end tests using working directory")
   (p/shell "node" "./e2e-test-ws/launch.js"))
