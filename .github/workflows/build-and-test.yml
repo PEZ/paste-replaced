@@ -128,7 +128,7 @@ jobs:
       - name: Run Tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: bb run-e2e-tests-vsix /tmp/*.vsix
+          run: bb run-e2e-tests-vsix $(ls /tmp/*.vsix)
 
   lint:
     runs-on: ubuntu-latest
