@@ -36,30 +36,29 @@
 
 (defn commit-changelog [file-name message dry-run?]
   (println "Committing")
-  (util/sh dry-run? "git" "add" file-name)
-  (util/sh dry-run?
-           "git" "commit"
-           "-m" message
-           "-o" file-name))
+  (util/shell dry-run? "git" "add" file-name)
+  (util/shell dry-run?
+              "git" "commit"
+              "-m" message
+              "-o" file-name))
 
 (defn tag [version dry-run?]
   (println "Tagging with version" version)
-  (util/sh dry-run?
-           "git" "tag"
-           "-a" (str "v" version)
-           "-m" (str "Version " version)))
+  (util/shell dry-run?
+              "git" "tag"
+              "-a" (str "v" version)
+              "-m" (str "Version " version)))
 
 (defn push [dry-run?]
   (println "Pushing")
-  (util/sh dry-run? "git" "push" "--follow-tags"))
+  (util/shell dry-run? "git" "push" "--follow-tags"))
 
 (defn git-status []
   (println "Checking git status")
-  (let [result (util/sh false "git" "status")
-        out (:out result)
-        [_ branch] (re-find #"^On branch (\S+)\n" out)
-        up-to-date (re-find #"Your branch is up to date" out)
-        clean (re-find #"nothing to commit, working tree clean" out)]
+  (let [git-status (util/shell false "git" "status")
+        [_ branch] (re-find #"^On branch (\S+)\n" git-status)
+        up-to-date (re-find #"Your branch is up to date" git-status)
+        clean (re-find #"nothing to commit, working tree clean" git-status)]
     (cond-> #{}
       (not= "master" branch) (conj :not-on-master)
       (not up-to-date) (conj :not-up-to-date)
