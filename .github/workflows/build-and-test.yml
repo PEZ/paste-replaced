@@ -104,14 +104,28 @@ jobs:
           pattern: '*.vsix'
           merge-multiple: true
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       - name: Setup Babashka
         uses: DeLaGuardo/setup-clojure@12.5
         with:
           bb: latest
 
       - name: Run Tests
-        run: |
-          bb run-e2e-tests-vsix /tmp/*.vsix
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: bb run-e2e-tests-vsix /tmp/*.vsix
 
   lint:
     runs-on: ubuntu-latest
