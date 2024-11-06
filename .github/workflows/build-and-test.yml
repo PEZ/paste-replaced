@@ -90,6 +90,25 @@ jobs:
       - name: Run Tests
         run: node out/extension-tests.js
 
+  e2e-test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download VSIX Artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp
+          pattern: '*.vsix'
+          merge-multiple: true
+
+      - name: Setup Babashka
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          bb: latest
+
+      - name: Run Tests
+        run: bb run-e2e-tests-vsix /tmp/*.vsix
+
   lint:
     runs-on: ubuntu-latest
     needs: build
