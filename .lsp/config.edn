@@ -1,0 +1,2 @@
+{:source-aliases #{:src :test :e2e-test-joyride}
+ :log-path "/tmp/clojure-lsp-pr.log"}
