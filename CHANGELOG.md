@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [v1.1.12] - 2024-11-06
+
 - Fix issue with humanized typing speed sometimes glitching
 
 ## [v1.1.11] - 2022-11-18
