@@ -1,4 +1,4 @@
-(ns test-runner.macros)
+(ns e2e.macros)
 
 (defmacro deftest-async [name opts & body]
   (let [[opts body]

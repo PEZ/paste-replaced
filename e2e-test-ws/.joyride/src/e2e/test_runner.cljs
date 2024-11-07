@@ -1,9 +1,8 @@
-(ns test-runner.runner
+(ns e2e.test-runner
   (:require [clojure.string :as string]
             [cljs.test]
             [promesa.core :as p]
-            [test-runner.config :as config]
-            [test-runner.db :as db]
+            [e2e.db :as db]
             ["vscode" :as vscode]))
 
 (defn- write [& xs]
@@ -67,15 +66,23 @@
                           (.map (partial file->ns src-path)))]
     (mapv symbol nss-strings)))
 
+(defn- run-when-ws-activated [nss-syms running tries]
+  (if (:ws-activated? @db/!state)
+    (-> (p/do
+          (println "Running tests in" nss-syms)
+          (apply require nss-syms)
+          (apply cljs.test/run-tests nss-syms)
+          running)
+        (p/catch (fn [e]
+                   (p/reject! (:running @db/!state) e))))
+    (do
+      (println "Runner: Workspace not activated yet, tries: " tries "- trying again in a jiffy")
+      (js/setTimeout #(run-when-ws-activated nss-syms running (inc tries)) 10)
+      running)))
+
 (defn run-all-tests [src-path]
   (let [running (p/deferred)]
     (swap! db/!state assoc :running running)
     (p/let [nss-syms (find-test-nss+ src-path)]
-      (println "Running tests in" nss-syms)
-      (-> (p/do
-            (apply require nss-syms)
-            (apply cljs.test/run-tests nss-syms)
-            running)
-          (p/catch (fn [e]
-                     (p/reject! (:running @db/!state) e)))))))
+      (run-when-ws-activated nss-syms running 1))))
 

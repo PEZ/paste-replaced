@@ -1,4 +1,4 @@
-(ns test-runner.db
+(ns e2e.db
   (:require [cljs.test]))
 
 (def !state (atom {:running nil
