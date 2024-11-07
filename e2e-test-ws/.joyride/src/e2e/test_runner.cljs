@@ -3,7 +3,8 @@
             [cljs.test]
             [promesa.core :as p]
             [e2e.db :as db]
-            ["vscode" :as vscode]))
+            ["vscode" :as vscode]
+            workspace-activate))
 
 (defn- write [& xs]
   (js/process.stdout.write (string/join " " xs)))
@@ -72,8 +73,10 @@
           (println "Running tests in" nss-syms)
           (apply require nss-syms)
           (apply cljs.test/run-tests nss-syms)
+          (workspace-activate/clean-up!)
           running)
         (p/catch (fn [e]
+                   (workspace-activate/clean-up!)
                    (p/reject! (:running @db/!state) e))))
     (do
       (println "Runner: Workspace not activated yet, tries: " tries "- trying again in a jiffy")
