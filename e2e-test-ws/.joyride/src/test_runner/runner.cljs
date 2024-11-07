@@ -62,21 +62,12 @@
       (string/replace #"\.cljs$" "")
       (string/replace #"^tests\." "")))
 
-(defn find-test-files+ [dir]
-  (p/let [js-dir-entries (vscode/workspace.fs.readDirectory dir)
-          dir-entries (js->clj js-dir-entries)
-          test-files (p/all (keep (fn [[name type]]
-                                    (let [full-path (vscode/Uri.joinPath dir name)]
-                                      (if (= type vscode/FileType.Directory)
-                                        (find-test-files+ full-path)
-                                        (when (and (= type vscode/FileType.File)
-                                                   (string/ends-with? name "_test.cljs"))
-                                          (p/resolved full-path)))))
-                                  dir-entries))]
-    (flatten test-files)))
+(defn find-test-files+ [path]
+  (p/->> (vscode/workspace.findFiles (str path "/**/*_test.cljs"))
+         (.map vscode/workspace.asRelativePath)))
 
-(defn get-test-namespaces+ [tests-directory]
-  (p/let [files (find-test-files+ tests-directory)]
+(defn get-test-namespaces+ [tests-path]
+  (p/let [files (find-test-files+ tests-path)]
     (def files files)
     (->> files
          (filter #(test-file? (first %)))
@@ -84,14 +75,8 @@
          (map symbol))))
 
 (comment
-  (def tests-directory (vscode/Uri.joinPath
-                        (-> vscode/workspace.workspaceFolders
-                            first
-                            .-uri)
-                        "e2e-test-ws"
-                        ".joyride"
-                        "src"))
-  (p/let [test-namespaces (get-test-namespaces+ tests-directory)]
+  (def tests-path "e2e-test-ws/.joyride/src")
+  (p/let [test-namespaces (get-test-namespaces+ tests-path)]
     (println "test-namespaces" test-namespaces)
     (def test-namespaces test-namespaces)
     :rcf)
