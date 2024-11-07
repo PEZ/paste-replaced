@@ -52,48 +52,30 @@
         (p/reject! running fail-reason)
         (p/resolve! running true)))))
 
-(defn test-file? [file]
-  (and (.endsWith file ".cljs")
-       (not (.startsWith file "_"))))
-
-(defn file->ns [file]
+(defn- file->ns [src-path file]
   (-> file
-      (string/replace #"/" ".")
+      (subs (inc (count src-path)))
       (string/replace #"\.cljs$" "")
-      (string/replace #"^tests\." "")))
+      (string/replace #"/" ".")
+      (string/replace #"_" "-")))
 
-(defn find-test-files+ [path]
-  (p/->> (vscode/workspace.findFiles (str path "/**/*_test.cljs"))
-         (.map vscode/workspace.asRelativePath)))
+(defn- find-test-nss+ [src-path]
+  (p/let [file-uris (vscode/workspace.findFiles (str src-path "/**/*_test.cljs"))
+          files (.map file-uris (fn [uri]
+                                  (vscode/workspace.asRelativePath uri false)))
+          nss-strings (-> files
+                          (.map (partial file->ns src-path)))]
+    (mapv symbol nss-strings)))
 
-(defn get-test-namespaces+ [tests-path]
-  (p/let [files (find-test-files+ tests-path)]
-    (def files files)
-    (->> files
-         (filter #(test-file? (first %)))
-         (map #(file->ns (first %)))
-         (map symbol))))
-
-(comment
-  (def tests-path "e2e-test-ws/.joyride/src")
-  (p/let [test-namespaces (get-test-namespaces+ tests-path)]
-    (println "test-namespaces" test-namespaces)
-    (def test-namespaces test-namespaces)
-    :rcf)
-  )
-
-(defn run-all-tests [tests-directory]
+(defn run-all-tests [src-path]
   (let [running (p/deferred)]
     (swap! db/!state assoc :running running)
-    (try
-      (doseq [ns-sym (config/ns-symbols)]
-        (require ns-sym)
-        (cljs.test/run-tests ns-sym))
-      (catch :default e
-        (p/reject! (:running @db/!state) e)))
-    running))
-
-(comment
-  (run-all-tests)
-  :rcf)
+    (p/let [nss-syms (find-test-nss+ src-path)]
+      (println "Running tests in" nss-syms)
+      (-> (p/do
+            (apply require nss-syms)
+            (apply cljs.test/run-tests nss-syms)
+            running)
+          (p/catch (fn [e]
+                     (p/reject! (:running @db/!state) e)))))))
 
