@@ -4,6 +4,8 @@ Changes to Paste Replaced
 
 ## [Unreleased]
 
+## [v1.1.13] - 2024-11-17
+
 - [Replacement command throws an errror](https://github.com/PEZ/paste-replaced/issues/7)
 
 ## [v1.1.12] - 2024-11-06
